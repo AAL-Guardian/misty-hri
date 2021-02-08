@@ -1,0 +1,19 @@
+{
+    "Name": "restful_endpoint",
+    "UniqueId": "81133e6b-2ed2-43b3-b09e-1cf311f16f44",
+    "Description": "My skill is amazing!",
+    "StartupRules": [
+      "Manual",
+      "Robot"
+    ],
+    "Language": "javascript",
+    "BroadcastMode": "verbose",
+    "TimeoutInSeconds": 60000,
+    "CleanupOnCancel": true,
+    "WriteToLog": false,
+    "Parameters": {
+      "int": 10,
+      "double": 20.5,
+      "string": "twenty"
+    }
+  }
