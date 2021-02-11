@@ -14,10 +14,12 @@ function startSkill()
 
     initHeadPose();
 
-    var current_state = "normal"; //create a default state variable on Misty
+    var current_state = "sleep"; //create a default state variable on Misty
     var state_data    ={"sleep":{"time_out":60000},
-                        "normal":{"time_out":5000, "look_around":5},
-                        "track_face":{"time_out":1000, "look_around":10}
+                        "normal":{"time_out":15000, "look_around":5},
+                        "track_face":{"time_out":5000, "look_around":10},
+                        "default":{"time_out":5000},
+                        "eye_image":"e_DefaultContent.jpg"
                         };
     
     stateMachine(current_state, state_data);
@@ -71,11 +73,11 @@ function _Touched(data)
 
         // wake up if sleeping
         var current_state = misty.Get("state");
-        var state_data = misty.Get("state_data")["current_state"];
+        var state_data = JSON.parse(misty.Get("state_data"));
         if (current_state == "sleep")
         {
-            misty.Set("state","normal", false);
-            stateMachine();
+            current_state = "normal";
+            stateMachine(current_state, state_data);
             
         }
     }
@@ -91,7 +93,7 @@ function registerYaw()
     misty.AddReturnProperty("headYaw", "SensorId");
     misty.AddReturnProperty("headYaw", "Value");
     misty.AddPropertyTest("headYaw", "SensorId", "==", "ahy", "string");
-    misty.RegisterEvent("headYaw", "ActuatorPosition", 100, true);
+    misty.RegisterEvent("headYaw", "ActuatorPosition", 200, true);
 }
 
 function registerPitch() 
@@ -99,7 +101,7 @@ function registerPitch()
     misty.AddReturnProperty("headPitch", "SensorId");
     misty.AddReturnProperty("headPitch", "Value");
     misty.AddPropertyTest("headPitch", "SensorId", "==", "ahp", "string");
-    misty.RegisterEvent("headPitch", "ActuatorPosition", 100, true);
+    misty.RegisterEvent("headPitch", "ActuatorPosition", 200, true);
 }
 
 function _headYaw(data) 
@@ -244,7 +246,7 @@ function _FaceDetect(data) {
     let bearing = data.AdditionalResults[1];
     let elevation = data.AdditionalResults[2];
     let distance = data.AdditionalResults[3];
-    misty.Debug("Label: " + label + ", Bearing: " + bearing+ ", Elevation: " + elevation+ ", Distance: " + distance);
+   // misty.Debug("Label: " + label + ", Bearing: " + bearing+ ", Elevation: " + elevation+ ", Distance: " + distance);
 
     
     const headYaw = misty.Get("headYaw");
@@ -261,8 +263,15 @@ function _FaceDetect(data) {
     misty.MoveHeadDegrees(new_pitch, new_roll , new_yaw, 60); // Faces head forward
 
     
-    misty.Set("state","track_face");
-    stateMachine(); // updates eyes and registers events based on the state
+    var current_state = misty.Get("state");
+    var state_data = JSON.parse(misty.Get("state_data"));
+    if (current_state != "track_face")
+    {
+        current_state = "track_face";
+        //state_data[next_state].time_out = 5000;
+        //state_date[next_state].look_around = 5;
+        stateMachine(current_state, state_data); // updates eyes and registers events based on the state
+    }
 }
 
 
@@ -342,28 +351,42 @@ function getRandomInt(min, max)
 function changeEyes()
 {
     var state = misty.Get("state");
+    var state_data = JSON.parse(misty.Get("state_data"));
+    let eye_image = state_data.eye_image;
 
     switch(state)
     {
         case "sleep":
-            misty.ChangeLED(50, 0, 0); // Changes LED to green
-            misty.DisplayImage("e_Sleeping.jpg"); // Show sleeping eyes
-            misty.SetBlinking(false);
+            misty.ChangeLED(0, 0, 0); // Changes LED to off
+            if (eye_image != "e_Sleeping.jpg")
+            {
+                misty.DisplayImage("e_Sleeping.jpg"); // Show sleeping eyes
+                misty.SetBlinking(false);
+            }
             break;
         case "normal":
             misty.ChangeLED(255, 255, 255); // Changes LED to white
-            misty.DisplayImage("e_DefaultContent.jpg"); // Show default eyes
-            misty.SetBlinking(true);
+            if (eye_image != "e_DefaultContent.jpg")
+            {
+                misty.DisplayImage("e_DefaultContent.jpg"); // Show default eyes
+                misty.SetBlinking(true);
+            }
             break;
         case "track_face":
             misty.ChangeLED(0, 255, 0); // Changes LED to green
-            misty.DisplayImage("e_Joy.jpg"); // Show default eyes
-            misty.SetBlinking(true);
+            if (eye_image != "e_Joy.jpg")
+            {
+                misty.DisplayImage("e_Joy.jpg"); // Show default eyes
+                misty.SetBlinking(true);
+            }
             break;
         default:
             misty.ChangeLED(148, 0, 211); // Changes LED to purple
-            misty.DisplayImage("e_Surprise.jpg"); // Show default eyes
-            misty.SetBlinking(true);
+            if (eye_image != "e_Surprise.jpg")
+            {
+                misty.DisplayImage("e_Surprise.jpg"); // Show default eyes
+                misty.SetBlinking(true);
+            }
             break;
     }
 
@@ -373,8 +396,9 @@ function changeEyes()
 function _timeOutLogic(callbackData)
 {
     var current_state = misty.Get("state");
-    var data  = misty.Get("state_data");
+    var data  = JSON.parse(misty.Get("state_data"));
     
+    misty.Debug("timeout callback :" + data);
     switch (current_state)
     {
         case "sleep":
@@ -393,7 +417,8 @@ function _timeOutLogic(callbackData)
             {
                 data[current_state].look_around = 5;
                 current_state = "sleep";
-                data[current_state].time_out = 60000;  
+                data[current_state].time_out = 60000;
+                initHeadPose();  
             }
             break;
         case "track_face":
@@ -407,19 +432,21 @@ function _timeOutLogic(callbackData)
             {
                 data[current_state].look_around = 5;
                 current_state = "normal";
-                data[current_state].time_out = 6000;  
+                data[current_state].time_out = 15000;  
             }
            break;
         default:
+            current_state = "normal";
+            data[current_state].time_out = 15000;
             break;
     }
     stateMachine(current_state, data); //update state and register
 }
 
-function stateMachine(current_state, data)
+function stateMachine(current_state, state_data)
 {
     misty.Set("state", current_state);
-    misty.Set("state_data", data);
+    misty.Set("state_data", JSON.stringify(state_data));
     
     switch (current_state)
     {
@@ -458,8 +485,8 @@ function stateMachine(current_state, data)
 
     // Registers for a timer event to invoke the _timeoutToNormal
     // callback function after 5000 milliseconds.
-    let time_out  = data[current_state].time_out;
-    misty.Debug("state -> " + state + "    time_out = " + time_out);
-    misty.RegisterTimerEvent("timeOutLogic", 5000, false);
+    let time_out  = state_data[current_state].time_out;
+    misty.Debug("state -> " + current_state + "    time_out = " + time_out);
+    misty.RegisterTimerEvent("timeOutLogic", time_out, false);
 }
 
