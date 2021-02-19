@@ -15,15 +15,82 @@ function startSkill()
     initHeadPose();
 
     var current_state = "sleep"; //create a default state variable on Misty
-    var state_data    ={"sleep":{"time_out":60000},
+    var state_data    ={"off":{},
+                        "sleep":{"time_out":300000},
                         "normal":{"time_out":15000, "look_around":5},
                         "track_face":{"time_out":5000, "look_around":10},
                         "default":{"time_out":5000},
-                        "eye_image":"e_DefaultContent.jpg"
+                        "eye_image":"e_DefaultContent.jpg",
+                        "blinking": true
                         };
     
+    
+    RegisterGuardianEvent();
     stateMachine(current_state, state_data);
 }
+
+// Respond to User events
+function RegisterGuardianEvent(data)
+{
+    //misty.AddPropertyTest("guardian", "guardian-command", "==", "eye_contact", "string");
+    //misty.AddReturnProperty("guardian", "guardian-data");
+    misty.RegisterUserEvent("guardian", true);
+}
+
+function _guardian(data)
+{
+    var received = data["guardian-data"];
+    misty.Debug("External command received -> " + received);
+    //misty.Debug(JSON.stringify(data));
+ 
+    var current_state = misty.Get("state");
+    var state_data  = JSON.parse(misty.Get("state_data"));
+
+    if (current_state != received) stateMachine(received, state_data);
+}
+
+// Wake on key phrase event
+function StartKeyPhraseRecognition() {
+    misty.Debug("Starting key phrase recognition...");
+    // Starts Misty listening for the "Hey, Misty" key phrase
+    misty.StartKeyPhraseRecognition();
+    // Registers for KeyPhraseRecognized events
+    misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
+    misty.Debug("KeyPhraseRecognition started. Misty will play a sound and wave when she hears 'Hey Misty'.");
+}
+
+// Callback function to execute when Misty hears the key phrase
+function _KeyPhraseRecognized() {
+    misty.Debug("Key phrase recognized!");
+    waveRightArm();
+
+   
+   var current_state = misty.Get("state");
+   var state_data = JSON.parse(misty.Get("state_data"));
+   if (current_state == "sleep")
+   {
+        // stop keyphrase detection and deregister callback
+        misty.UnregisterEvent("KeyPhraseRecognised");
+        misty.StopKeyPhraseRecognition();
+        
+        current_state = "normal";
+        //state_data[next_state].time_out = 5000;
+        //state_date[next_state].look_around = 5;
+        stateMachine(current_state, state_data); // updates eyes and registers events based on the state
+   }
+}
+
+// Helper function to wave Misty's arm
+function waveRightArm() {
+   misty.MoveArmDegrees("left", 90, 45); // Left arm fully down
+   misty.Pause(50);
+   misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
+   misty.Pause(50); // Pause for 3 seconds
+   misty.MoveArmDegrees("right", -45, 45); // Right arm fully up
+   misty.Pause(1000); // Pause with arm up for 5 seconds (wave!)
+   misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
+}
+
 
 // Respond to touch events
 function registerTouch()
@@ -44,27 +111,27 @@ function _Touched(data)
 
         if (sensor == "Chin")
         {            
-            misty.PlayAudio("s_PhraseOwwww.wav");   
+            //misty.PlayAudio("s_PhraseOwwww.wav");   
         } 
         else if (sensor == "HeadRight")
         {
-            misty.PlayAudio("s_PhraseEvilAhHa.wav");   
+            //misty.PlayAudio("s_PhraseEvilAhHa.wav");   
         } 
         else if (sensor == "HeadLeft")
         {
-            misty.PlayAudio("s_Distraction.wav");   
+            //misty.PlayAudio("s_Distraction.wav");   
         } 
         else if (sensor == "HeadFront")
         {
-            misty.PlayAudio("017-Sensor-Touch-Excitement-02.wav");
+            misty.PlayAudio("010-Uhm.wav");
         } 
         else if (sensor == "HeadBack")
         {
-            misty.PlayAudio("s_Disapproval.wav");
+            //misty.PlayAudio("s_Disapproval.wav");
         } 
         else if (sensor == "Scruff")
         {
-            misty.PlayAudio("s_Grief.wav");
+            //misty.PlayAudio("s_Grief.wav");
         } 
         else 
         {
@@ -104,55 +171,35 @@ function registerPitch()
     misty.RegisterEvent("headPitch", "ActuatorPosition", 200, true);
 }
 
+function registerRoll() 
+{
+    misty.AddReturnProperty("headRoll", "SensorId");
+    misty.AddReturnProperty("headRoll", "Value");
+    misty.AddPropertyTest("headRoll", "SensorId", "==", "ahr", "string");
+    misty.RegisterEvent("headRoll", "ActuatorPosition", 200, true);
+}
+
 function _headYaw(data) 
 {
     var headYaw = data.AdditionalResults[1];
     // misty.Debug(headYaw);
-    misty.Set("headYaw", headYaw, false);
+    if (!isNaN(headYaw)) misty.Set("headYaw", headYaw, false);
 }
 
 function _headPitch(data) 
 {
     var headPitch = data.AdditionalResults[1];
-    // misty.Debug(headPitch);
-    misty.Set("headPitch", headPitch, false);
+    // misty.Debug(headPitch);   
+    if (!isNaN(headPitch)) misty.Set("headPitch", headPitch, false);
 }
 
-/*
-//misty.UnregisterEvent("Headpose");  // sometimes the skill is not deregistered properly?
-misty.AddReturnProperty("Headpose", "SensorId");
-misty.AddReturnProperty("Headpose", "Value");
-//misty.AddPropertyTest("Headpose", "SensorId", "exists", "", "string");
-misty.RegisterEvent("Headpose", "ActuatorPosition", 200, true); // update every 200ms
-
-function _Headpose(data)
+function _headRoll(data) 
 {
-    var sensorName = data.AdditionalResults[0];
-    var value= data.AdditionalResults[1];
-    //misty.Debug(sensorName + " -> " + value);
-    switch (sensorName) {
-        case "ahy":
-            misty.Set("headYaw", value, false);
-            misty.Debug(sensorName + " -> " + value);
-    break;
-        case "ahp":
-            misty.Set("headPitch", value, false);
-            misty.Debug(sensorName + " -> " + value);
-    break;
-        case "ahr":
-            misty.Set("headRoll", value, false);
-            break;
-         case "ara":
-            misty.Set("rightArm", value, false);
-            break;
-        case "ala":
-            misty.Set("leftArm", value, false);
-            break;
-           default:
-            break;
-    }
+    var headRoll = data.AdditionalResults[1];
+    // misty.Debug(headRoll);   
+    if (!isNaN(headRoll)) misty.Set("headRoll", headRoll, false);
 }
-*/
+
 
 // ================================ Calibrate =================================
 // Misty moves the head right left down up and records the max reachable angles.
@@ -241,7 +288,12 @@ function registerFaceDetection() {
 // Defines how Misty should respond to FaceDetect event messages. Data
 // from each FaceDetect event is passed into this callback function.
 function _FaceDetect(data) {
-
+    // Stop reading actuators during computation and movevement of head?
+    //misty.UnregisterEvent("HeadYaw"); 
+    //misty.UnregisterEvent("HeadPitch"); 
+    //misty.UnregisterEvent("HeadRoll"); 
+    //misty.UnregisterEvent("FaceDetect"); // stop misty from responding to new events
+    
     let label = data.AdditionalResults[0]; // or data.PropertyTestResults[0].PropertyParent.Label etc.
     let bearing = data.AdditionalResults[1];
     let elevation = data.AdditionalResults[2];
@@ -255,23 +307,50 @@ function _FaceDetect(data) {
     const yawLeft = misty.Get("yawLeft");
     const pitchUp = misty.Get("pitchUp");
     const pitchDown = misty.Get("pitchDown");
-    
-    var new_pitch = headPitch + ((pitchDown - pitchUp) / 33) * elevation; // -13 up and +13 down // unclear in which units bearing and elevation are given
-    var new_yaw   = headYaw   + ((yawLeft - yawRight) / 66) * bearing; // -13 right and +13 left
-    var new_roll = misty.Get("headRoll");
-    misty.Debug(new_pitch + " , " + new_yaw );
-    misty.MoveHeadDegrees(new_pitch, new_roll , new_yaw, 60); // Faces head forward
 
-    
+    const camera_angle = {"horizontal": 106, "vertical": 60};
+
+    //var new_pitch = headPitch + ((pitchDown - pitchUp) / 33) * elevation; // -13 up and +13 down // unclear in which units bearing and elevation are given
+    //var new_yaw   = headYaw   + ((yawLeft - yawRight) / 66) * bearing; // -13 right and +13 left
+    var new_pitch = headPitch + (camera_angle.vertical / 33) * elevation; // -13 up and +13 down // unclear in which units bearing and elevation are given
+    var new_yaw   = headYaw   + (camera_angle.horizontal /66) * bearing; // -13 right and +13 left
+    var new_roll = 0.8  * misty.Get("headRoll"); // slowly reduce head roll
+    if ( !( isNaN(new_pitch) || isNaN(new_yaw) || isNaN(new_roll)) )
+    {
+        // clip values to maximum range
+        if (new_pitch < pitchUp)        new_pitch = pitchUp;
+        else if (new_pitch > pitchDown) new_pitch = pitchDown;
+        if (new_yaw > yawLeft)          new_yaw = yawLeft;
+        else if (new_yaw < yawRight)    new_yaw = yawRight;
+        
+        // move the robot's head
+        misty.Debug(new_pitch + " , " + new_yaw );
+        misty.MoveHeadDegrees(new_pitch, new_roll , new_yaw, 80); // Faces head forward
+
+        // update headpose to new values;
+        misty.Set("headYaw"  , new_yaw, false);
+        misty.Set("headPitch", new_pitch, false);
+        misty.Set("headRoll", new_roll, false);
+    }
+
+    // Restore reading actuator values
+    //registerYaw();
+    //registerPitch();
+    //registerRoll();
+    //registerFaceDetection();
+
+
     var current_state = misty.Get("state");
     var state_data = JSON.parse(misty.Get("state_data"));
-    if (current_state != "track_face")
+    if (current_state == "normal")
     {
         current_state = "track_face";
         //state_data[next_state].time_out = 5000;
         //state_date[next_state].look_around = 5;
-        stateMachine(current_state, state_data); // updates eyes and registers events based on the state
     }
+    
+    stateMachine(current_state, state_data); // updates eyes and registers events based on the state
+    
 }
 
 
@@ -353,15 +432,34 @@ function changeEyes()
     var state = misty.Get("state");
     var state_data = JSON.parse(misty.Get("state_data"));
     let eye_image = state_data.eye_image;
+    let blinking = state_data.blinking;
 
     switch(state)
     {
+        case "off":
+            misty.ChangeLED(0, 0, 0); // Changes LED to off
+            if (eye_image != "e_DefaultContent.jpg")
+            {
+                misty.DisplayImage("e_DefaultContent.jpg"); // Show default eyes
+                state_data.eye_image = "e_DefaultContent.jpg";
+            }
+            if (!blinking) 
+            {
+                misty.SetBlinking(true);
+                state_data.blinking = true;
+            }
+            break;
         case "sleep":
             misty.ChangeLED(0, 0, 0); // Changes LED to off
             if (eye_image != "e_Sleeping.jpg")
             {
                 misty.DisplayImage("e_Sleeping.jpg"); // Show sleeping eyes
+                state_data.eye_image = "e_Sleeping.jpg";
+            }
+            if (blinking)
+            {
                 misty.SetBlinking(false);
+                state_data.blinking = false;
             }
             break;
         case "normal":
@@ -369,7 +467,12 @@ function changeEyes()
             if (eye_image != "e_DefaultContent.jpg")
             {
                 misty.DisplayImage("e_DefaultContent.jpg"); // Show default eyes
+                state_data.eye_image = "e_DefaultContent.jpg";
+            }
+            if (!blinking) 
+            {
                 misty.SetBlinking(true);
+                state_data.blinking = true;
             }
             break;
         case "track_face":
@@ -377,7 +480,13 @@ function changeEyes()
             if (eye_image != "e_Joy.jpg")
             {
                 misty.DisplayImage("e_Joy.jpg"); // Show default eyes
+                state_data.eye_image = "e_Joy.jpg";
+
+            }
+            if (!blinking) 
+            {
                 misty.SetBlinking(true);
+                state_data.blinking = true;
             }
             break;
         default:
@@ -385,10 +494,16 @@ function changeEyes()
             if (eye_image != "e_Surprise.jpg")
             {
                 misty.DisplayImage("e_Surprise.jpg"); // Show default eyes
+                state_data.eye_image = "e_Surprise.jpg";
+            }
+            if (!blinking) 
+            {
                 misty.SetBlinking(true);
+                state_data.blinking = true;
             }
             break;
     }
+    misty.Set("state_data",JSON.stringify(state_data));
 
 }
 
@@ -398,7 +513,7 @@ function _timeOutLogic(callbackData)
     var current_state = misty.Get("state");
     var data  = JSON.parse(misty.Get("state_data"));
     
-    misty.Debug("timeout callback :" + data);
+    //misty.Debug("timeout callback :" + JSON.stringify(data));
     switch (current_state)
     {
         case "sleep":
@@ -445,48 +560,61 @@ function _timeOutLogic(callbackData)
 
 function stateMachine(current_state, state_data)
 {
+    var old_state = misty.Get("state");
     misty.Set("state", current_state);
     misty.Set("state_data", JSON.stringify(state_data));
     
-    switch (current_state)
+    if (current_state != old_state)
     {
-        case "sleep":
-            // reacting to touch
-            registerTouch();
- 
-            // Stop face recognition
-            misty.StopFaceDetection();
-            //misty.UnregisterEvent("FaceDetect");
-           
-            // Stop reading actuators?
-            //misty.UnregisterEvent("HeadYaw"); 
-            //misty.UnregisterEvent("HeadPitch"); 
-            //misty.UnregisterEvent("HeadRoll"); 
- 
-            break;
-        case "normal":
-        case "track_face":
-            // read actuator values
-            registerYaw();
-            registerPitch();
-            //registerRoll();
+        switch (current_state)
+        {
+            case "sleep":
+                // start keyphrase detection and register callback
+                StartKeyPhraseRecognition();    
 
-            // start face recognition
-            registerFaceDetection();
-            // Starts Misty's face detection process, so we can register for
-            // (and receive) FaceRecognition event messages.
-            misty.StopFaceDetection(); // is this necessary?
-            misty.StartFaceDetection();
-            break;
-        default:
-            break;
+                // reacting to touch
+                registerTouch();
+    
+                // Stop face recognition
+                misty.StopFaceDetection();
+                //misty.UnregisterEvent("FaceDetect");
+            
+                // Stop reading actuators?
+                //misty.UnregisterEvent("headYaw"); 
+                //misty.UnregisterEvent("headPitch"); 
+                //misty.UnregisterEvent("headRoll"); 
+    
+                break;
+            case "normal":
+            case "track_face":
+            
+                // read actuator values
+                registerYaw();
+                registerPitch();
+                registerRoll(); 
+
+                // start face recognition
+                registerFaceDetection();
+                // Starts Misty's face detection process, so we can register for
+                // (and receive) FaceRecognition event messages.
+                misty.StopFaceDetection(); // is this necessary?
+                misty.StartFaceDetection();
+                break;
+            case "off":
+                misty.StopFaceDetection(); // is this necessary?
+            default:
+                break;
+        }
     }
     changeEyes(); // the eyes reflect the state of the robot
 
     // Registers for a timer event to invoke the _timeoutToNormal
     // callback function after 5000 milliseconds.
-    let time_out  = state_data[current_state].time_out;
-    misty.Debug("state -> " + current_state + "    time_out = " + time_out);
-    misty.RegisterTimerEvent("timeOutLogic", time_out, false);
+    if (current_state != "off")
+    {
+        let time_out  = state_data[current_state].time_out;
+        misty.Debug("state -> " + current_state + "    time_out = " + time_out);
+        misty.RegisterTimerEvent("timeOutLogic", time_out, false);
+    }
 }
 

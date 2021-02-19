@@ -1,0 +1,16 @@
+{
+    "Name":"demo_raise_event",
+    "UniqueId":"61d88321-f8ae-4e80-a656-8b4d84e83ce5",
+    "Description":"My skill is amazing!",
+    "StartupRules":["Manual","Robot"],
+    "Language":"javascript",
+    "BroadcastMode":"verbose",
+    "TimeoutInSeconds":6000,
+    "CleanupOnCancel":true,
+    "WriteToLog":false,
+    "Parameters":{
+        "int":10,
+        "double":20.5,
+        "string":"twenty"
+    }
+}
