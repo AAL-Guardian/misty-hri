@@ -32,21 +32,24 @@ function startSkill()
 // Respond to User events
 function RegisterGuardianEvent(data)
 {
-    //misty.AddPropertyTest("guardian", "guardian-command", "==", "eye_contact", "string");
-    //misty.AddReturnProperty("guardian", "guardian-data");
+    //misty.AddPropertyTest("guardian", "guardian_command", "==", "eye_contact", "string");
+    //misty.AddReturnProperty("guardian", "guardian_data");
     misty.RegisterUserEvent("guardian", true);
 }
 
 function _guardian(data)
 {
-    var received = data["guardian-data"];
-    misty.Debug("External command received -> " + received);
-    //misty.Debug(JSON.stringify(data));
- 
-    var current_state = misty.Get("state");
-    var state_data  = JSON.parse(misty.Get("state_data"));
+    if (data["guardian_command"] == "eye_contact")
+    {
+        let received = data["guardian_data"];
+        misty.Debug("External command received -> " + received);
+        //misty.Debug(JSON.stringify(data));
+    
+        var current_state = misty.Get("state");
+        var state_data  = JSON.parse(misty.Get("state_data"));
 
-    if (current_state != received) stateMachine(received, state_data);
+        if (current_state != received) stateMachine(received, state_data);
+    }
 }
 
 // Wake on key phrase event

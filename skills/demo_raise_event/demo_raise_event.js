@@ -1,5 +1,5 @@
 const event_name = "guardian";
-const event_data = JSON.stringify({"guardian-command": "eye_contact", "guardian-data": "sleep"});
+const event_data = JSON.stringify({"guardian_command": "eye_contact", "guardian_data": "sleep"});
 const the_source = "demo_raise_event";
 const receiving_skills = ""; //["5d3e55e9-c878-4fbc-8d62-172fbdd9c48c"]; // use empty string "" instead of list to broadcast to all skills
 
@@ -27,7 +27,7 @@ function _TimerEvent() {
     } else {
         //misty.UnregisterEvent("TimerEvent");
         var the_data = JSON.parse(misty.Get("event_data"));
-        the_data["guardian-data"]="off";
+        the_data["guardian_data"]="off";
         misty.TriggerEvent("guardian", "demo", JSON.stringify(the_data), "");
         misty.Debug("Finished raising events.");
     }
