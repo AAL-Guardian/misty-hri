@@ -18,7 +18,7 @@ by changing the eyes again.
 
 The chest led changes colour accordingly:
 - Off: misty sleeps or eye contact is off
-- white: misty is awake and looks for a face
+- White: misty is awake and looks for a face
 - Green: face detected and tracking face
 
 When asleep, Misty can wake up again by
@@ -27,9 +27,9 @@ When asleep, Misty can wake up again by
 - raising a user event named "guardian" and event data
 
 event_data = {"guardian_command": "eye_contact",
-              "guardian_data"   : <state>};
+              "guardian_data"   : "state"};
  
- , where <state> can be "off", "sleep", or "normal".
+, where "state" can be "off", "sleep", or "normal".
 
 ## To do:
 - Decide whether to implement face recognition
