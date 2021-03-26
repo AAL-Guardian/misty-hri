@@ -1,0 +1,14 @@
+{
+  "Name": "speak_from_url",
+  "UniqueId": "b42f21af-a870-45d1-afe9-17f35e1f51fc",
+  "Description": "Misty speaks messages from cloud to user.",
+  "StartupRules": [
+    "Manual",
+    "Robot"
+  ],
+  "Language": "javascript",
+  "BroadcastMode": "debug",
+  "TimeoutInSeconds": 36000,
+  "CleanupOnCancel": true,
+  "WriteToLog": false,
+}
