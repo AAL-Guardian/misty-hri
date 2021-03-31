@@ -57,7 +57,7 @@ function _guardian(data) {
         //misty.Pause(2000);
         _count -= 1;
         misty.Debug("https://api.guardian.jef.it/dev/upload-url/audio/"+ misty.Get('robot_code'))
-        misty.SendExternalRequest("GET","https://api.guardian.jef.it/dev/upload-url/audio/"+ misty.Get('robot_code')+ "-" + misty.Get("headYaw"), null, null, null, false, false, null, null, 'afterGettingUrl');
+        misty.SendExternalRequest("GET","https://api.guardian.jef.it/dev/upload-url/audio/"+ misty.Get('robot_code')+ "_" + misty.Get("headYaw"), null, null, null, false, false, null, null, 'afterGettingUrl');
 
        
        // var the_data = misty.Get("event_data");
