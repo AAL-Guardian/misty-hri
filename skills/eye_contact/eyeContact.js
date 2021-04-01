@@ -73,8 +73,8 @@ function _KeyPhraseRecognized() {
    if (current_state == "sleep")
    {
         // stop keyphrase detection and deregister callback
-        misty.UnregisterEvent("KeyPhraseRecognised");
-        misty.StopKeyPhraseRecognition();
+//        misty.UnregisterEvent("KeyPhraseRecognised");
+//        misty.StopKeyPhraseRecognition();
         
         current_state = "normal";
         //state_data[next_state].time_out = 5000;
@@ -573,7 +573,7 @@ function stateMachine(current_state, state_data)
         {
             case "sleep":
                 // start keyphrase detection and register callback
-                StartKeyPhraseRecognition();    
+             //   StartKeyPhraseRecognition();    
 
                 // reacting to touch
                 registerTouch();
