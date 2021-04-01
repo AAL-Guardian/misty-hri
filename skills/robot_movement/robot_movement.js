@@ -9,20 +9,20 @@ function _guardian(data) {
     misty.Debug(JSON.stringify(data));
    let direction =  data["guardian_data"]
   
-   if (direction> 0 && direction < 90){
+   if (direction>=0 && direction <= 90){
     misty.Debug('Head movement 1');
     direction = (direction*-81)/90; 
     misty.MoveHeadDegrees(-20, 0, direction, 50);
     misty.Debug('head moved!');
     }
-    if (direction> 270 && direction < 360){
+    if (direction>=270 && direction <= 360){
     misty.Debug('Head movement 2');
     direction =((360-direction)*81)/90;  
     misty.MoveHeadDegrees(-20, 0, direction, 50);
     misty.Debug('head moved!');
     
     }
-    if (direction> 180 && direction < 270){
+    if (direction>= 180 && direction < 270){
     misty.Debug('Robot movement 3');
      misty.Drive(0, -100);
     misty.Debug("si muove");
