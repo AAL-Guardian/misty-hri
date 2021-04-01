@@ -1,6 +1,8 @@
 // Sets Misty's arms and head to a neutral position, and prints a debug
 // message that the movement is underway.
 misty.Debug("Eye contact skill");
+var enable_keyphrase_recognition = false;
+
 startSkill();
 
 function startSkill()
@@ -72,10 +74,11 @@ function _KeyPhraseRecognized() {
    var state_data = JSON.parse(misty.Get("state_data"));
    if (current_state == "sleep")
    {
-        // stop keyphrase detection and deregister callback
-        misty.UnregisterEvent("KeyPhraseRecognised");
-        misty.StopKeyPhraseRecognition();
-        
+        if (enable_keyphrase_recognition) {
+    // stop keyphrase detection and deregister callback
+            misty.UnregisterEvent("KeyPhraseRecognised");
+            misty.StopKeyPhraseRecognition();
+        }
         current_state = "normal";
         //state_data[next_state].time_out = 5000;
         //state_date[next_state].look_around = 5;
@@ -573,8 +576,9 @@ function stateMachine(current_state, state_data)
         {
             case "sleep":
                 // start keyphrase detection and register callback
-                StartKeyPhraseRecognition();    
-
+                if (enable_keyphrase_recogntion) {
+                    StartKeyPhraseRecognition();    
+                }
                 // reacting to touch
                 registerTouch();
     
