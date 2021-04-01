@@ -29,7 +29,7 @@ function _guardian(data) {
     direction =((direction-180)*-81)/90; 
      misty.MoveHeadDegrees(-20, 0, direction,50);
      misty.Debug('head moved!');
-
+    
     }
     if (direction> 90 && direction < 180){
     misty.Debug('Head movement 4');
