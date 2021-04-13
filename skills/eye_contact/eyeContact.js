@@ -555,10 +555,10 @@ function _timeOutLogic(callbackData)
                 current_state = "normal";
                 data[current_state].time_out = 15000;  
             }
-           break;
+            break;
+        case "off":
+            break;
         default:
-            current_state = "normal";
-            data[current_state].time_out = 15000;
             break;
     }
     stateMachine(current_state, data); //update state and register
