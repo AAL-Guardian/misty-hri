@@ -36,13 +36,13 @@ function RegisterGuardianEvent(data)
 {
     //misty.AddPropertyTest("guardian", "guardian_command", "==", "eye_contact", "string");
     //misty.AddReturnProperty("guardian", "guardian_data");
-    misty.RegisterUserEvent("guardian", true);
+    misty.RegisterUserEvent("eye_contact", true);
 }
 
-function _guardian(data)
+function _eye_contact(data)
 {
-    if (data["guardian_command"] == "eye_contact")
-    {
+    //if (data["guardian_command"] == "eye_contact")
+    //{
         let received = data["guardian_data"];
         misty.Debug("External command received -> " + received);
         //misty.Debug(JSON.stringify(data));
@@ -51,7 +51,7 @@ function _guardian(data)
         var state_data  = JSON.parse(misty.Get("state_data"));
 
         if (current_state != received) stateMachine(received, state_data);
-    }
+    //}
 }
 
 // Wake on key phrase event
