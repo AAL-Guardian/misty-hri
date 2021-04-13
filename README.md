@@ -23,7 +23,7 @@ The chest led changes colour accordingly:
 
 When asleep, Misty can wake up again by
 - touching its head
-~~- calling "Hey Misty!"~~  (This is currently disabled)
+- ~~- calling "Hey Misty!"~~  (This is currently disabled)
 - raising a user event named "eye_contact" and event data
 
 event_data = {"guardian_data"   : "state"};
