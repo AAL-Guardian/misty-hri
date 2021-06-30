@@ -36,13 +36,13 @@ function registerActuatorPosition(){
  }
     
 
-misty.RegisterUserEvent("guardian", true);
+misty.RegisterUserEvent("record_audio", true);
 
 // TimerEvent callback
-function _guardian(data) {
-    if (data["guardian_command"] !== "record_audio"){
-        return; 
-    }
+function _record_audio(data) {
+    // if (data["guardian_command"] !== "record_audio"){
+    //     return;
+    // }
     if (_count > 0)
     {
         // Change LED to random color

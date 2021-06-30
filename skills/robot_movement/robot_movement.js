@@ -1,11 +1,11 @@
 
-misty.RegisterUserEvent("guardian", true);
+misty.RegisterUserEvent("move_head", true);
 
-function _guardian(data) {
+function _move_head(data) {
     misty.Debug(data);
-    if (data["guardian_command"] !== "move_head"){
-        return;
-    }
+    // if (data["guardian_command"] !== "move_head"){
+    //     return;
+    // }
     misty.Debug(JSON.stringify(data));
    let direction =  data["guardian_data"]
   
