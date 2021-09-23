@@ -19,6 +19,6 @@ function _speak_from_url(data)
     // {
         let received = data["guardian_data"];
         misty.Debug("External command received -> " + received);
-        misty.PlayAudio(received);
+        misty.PlayAudio(received['url'], received['volume']);
     // }
 }
