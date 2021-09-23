@@ -14,8 +14,8 @@ skill_id = "5d3e55e9-c878-4fbc-8d62-172fbdd9c48c"
 def send_command(the_command):
     resp = requests.post('http://'+robot_ip+'/api/skills/event',json={
         "Skill" : skill_id,
-        "EventName": "guardian",
-        "Payload": {"guardian_command": "eye_contact",
+        "EventName": "eye_contact",
+        "Payload": { ##"guardian_command": "eye_contact",
                     "guardian_data": the_command},
         "Source": "MyRobotApplication"})
     return resp
