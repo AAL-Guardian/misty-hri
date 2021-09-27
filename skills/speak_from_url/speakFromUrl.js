@@ -15,11 +15,7 @@ function RegisterGuardianEvent()
 
 function _speak_from_url(data)
 {
-    // if (data["guardian_command"] === "speak_from_url")
-    // {
-        let received = data["guardian_data"];
-        console.log('data', data);
-        misty.Debug("External command received -> " + received);
-        misty.PlayAudio(received.url, received.volume);
-    // }
+    const received = data["guardian_data"];
+    const decoded = JSON.parse(received);
+    misty.PlayAudio(decoded.url, decoded.volume);
 }
