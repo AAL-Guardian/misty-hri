@@ -1,7 +1,7 @@
 // Sets Misty's arms and head to a neutral position, and prints a debug
 // message that the movement is underway.
 misty.Debug("Eye contact skill");
-misty.Set("enable_keyphrase_recognition", false);
+misty.Set("enable_keyphrase_recognition", true);
 
 startSkill();
 
@@ -19,7 +19,7 @@ function startSkill()
     initHeadPose();
 
     var current_state = "sleep"; //create a default state variable on Misty
-    var state_data    ={"off":{},
+    var default_data    ={"off":{},
                         "sleep":{"time_out":300000},
                         "normal":{"time_out":15000, "look_around":5},
                         "track_face":{"time_out":5000, "look_around":10},
@@ -30,7 +30,7 @@ function startSkill()
                         
     
     RegisterGuardianEvent();
-    stateMachine(current_state, state_data);
+    stateMachine(current_state, default_data); // sets and stores new state
 }
 
 // Respond to User events
@@ -454,7 +454,7 @@ function changeEyes()
             }
             if (!blinking) 
             {
-                misty.SetBlinking(true);
+                misty.SetBlinking(true); // turn blinking on
                 state_data.blinking = true;
             }
             break;
@@ -467,7 +467,7 @@ function changeEyes()
             }
             if (blinking)
             {
-                misty.SetBlinking(false);
+                misty.SetBlinking(false);  // turn blinking off
                 state_data.blinking = false;
             }
             break;
@@ -527,8 +527,8 @@ function _timeOutLogic(callbackData)
     {
         case "sleep":
             // misty wakes after sleeping for 10 min
-            current_state = "normal";
-            data[current_state] = {"time_out":5000, "look_around":5};
+            new_state = "normal";
+            //data[current_state] = {"time_out":5000, "look_around":5}; // use default
             break;
         case "normal":
             // no faces detected, look around a few minutes then go to sleep
@@ -541,7 +541,7 @@ function _timeOutLogic(callbackData)
             {
                 data[current_state].look_around = 5;
                 current_state = "sleep";
-                data[current_state].time_out = 60000;
+            //    data[current_state].time_out = 60000; // use default
                 initHeadPose();  
             }
             break;
@@ -555,8 +555,8 @@ function _timeOutLogic(callbackData)
             else
             {
                 data[current_state].look_around = 5;
-                current_state = "normal";
-                data[current_state].time_out = 15000;  
+                new_state = "normal";
+            //    data[current_state].time_out = 15000;  
             }
             break;
         case "off":
@@ -564,7 +564,7 @@ function _timeOutLogic(callbackData)
         default:
             break;
     }
-    stateMachine(current_state, data); //update state and register
+    stateMachine(new_state, data); //update state and register new time event
 }
 
 function stateMachine(current_state, state_data)
