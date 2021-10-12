@@ -1,7 +1,7 @@
 // Sets Misty's arms and head to a neutral position, and prints a debug
 // message that the movement is underway.
 misty.Debug("Eye contact skill");
-var enable_keyphrase_recognition = false;
+misty.Set("enable_keyphrase_recognition", false);
 
 startSkill();
 
@@ -12,7 +12,9 @@ function startSkill()
     misty.Set("yawLeft", 83.6, false);
     misty.Set("pitchUp", -37.8, false);
     misty.Set("pitchDown", 24.6, false);
-
+    misty.Set("state", ""); // make sure the initial state is void
+    misty.Set("state_data", "");
+    
 
     initHeadPose();
 
@@ -25,7 +27,7 @@ function startSkill()
                         "eye_image":"e_DefaultContent.jpg",
                         "blinking": true
                         };
-    
+                        
     
     RegisterGuardianEvent();
     stateMachine(current_state, state_data);
@@ -74,7 +76,7 @@ function _KeyPhraseRecognized() {
    var state_data = JSON.parse(misty.Get("state_data"));
    if (current_state == "sleep")
    {
-        if (enable_keyphrase_recognition) {
+        if (misty.Get("enable_keyphrase_recognition")) {
     // stop keyphrase detection and deregister callback
             misty.UnregisterEvent("KeyPhraseRecognised");
             misty.StopKeyPhraseRecognition();
@@ -101,6 +103,7 @@ function waveRightArm() {
 // Respond to touch events
 function registerTouch()
 {
+    misty.Debug("Registering Touch");
     misty.AddReturnProperty("Touched", "SensorPosition");
     misty.AddReturnProperty("Touched", "IsContacted");
     misty.RegisterEvent("Touched", "TouchSensor", 50 ,true);
@@ -117,15 +120,15 @@ function _Touched(data)
 
         if (sensor == "Chin")
         {            
-            //misty.PlayAudio("s_PhraseOwwww.wav");   
+            misty.PlayAudio("010-Uhm.wav");   
         } 
         else if (sensor == "HeadRight")
         {
-            //misty.PlayAudio("s_PhraseEvilAhHa.wav");   
+            misty.PlayAudio("010-Uhm.wav");   
         } 
         else if (sensor == "HeadLeft")
         {
-            //misty.PlayAudio("s_Distraction.wav");   
+            misty.PlayAudio("010-Uhm.wav");   
         } 
         else if (sensor == "HeadFront")
         {
@@ -133,11 +136,11 @@ function _Touched(data)
         } 
         else if (sensor == "HeadBack")
         {
-            //misty.PlayAudio("s_Disapproval.wav");
+            misty.PlayAudio("010-Uhm.wav");
         } 
         else if (sensor == "Scruff")
         {
-            //misty.PlayAudio("s_Grief.wav");
+            misty.PlayAudio("010-Uhm.wav");
         } 
         else 
         {
@@ -576,7 +579,7 @@ function stateMachine(current_state, state_data)
         {
             case "sleep":
                 // start keyphrase detection and register callback
-                if (enable_keyphrase_recogntion) {
+                if (misty.Get("enable_keyphrase_recogntion")) {
                     StartKeyPhraseRecognition();    
                 }
                 // reacting to touch
