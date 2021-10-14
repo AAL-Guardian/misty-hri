@@ -1,7 +1,7 @@
 // Sets Misty's arms and head to a neutral position, and prints a debug
 // message that the movement is underway.
 misty.Debug("Eye contact skill");
-misty.Set("enable_keyphrase_recognition", true);
+misty.Set("enable_keyphrase_recognition", false);
 
 startSkill();
 
