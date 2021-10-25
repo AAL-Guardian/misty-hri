@@ -1,6 +1,6 @@
 {
   "Name": "volume_check",
-  "UniqueId": "b42f21af-volume_check",
+  "UniqueId": "b42f21af-volume-check",
   "Description": "Misty plays a sound to check volume.",
   "StartupRules": [
     "Manual",
