@@ -1,7 +1,7 @@
 // Sets Misty's arms and head to a neutral position, and prints a debug
 // message that the movement is underway.
 misty.Debug("Eye contact skill");
-misty.Set("enable_keyphrase_recognition", false);
+misty.Set("enable_keyphrase_recognition", "false");
 
 startSkill();
 
@@ -30,6 +30,8 @@ function startSkill()
                         
     
     RegisterGuardianEvent();
+    misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
+    misty.Debug("KeyPhraseRecognition started. Misty will play a sound and wave when she hears 'Hey Misty'.");
     stateMachine(current_state, default_data); // sets and stores new state
 }
 
@@ -48,6 +50,8 @@ function _eye_contact(data)
         let received = data["guardian_data"];
         misty.Debug("External command received -> " + received);
         //misty.Debug(JSON.stringify(data));
+        var the_data = JSON.stringify({event: "received"}); //"External command received -> " + received;
+        misty.TriggerEvent("guardian", "eyeContactSkill", the_data, "");
     
         var current_state = misty.Get("state");
         var state_data  = JSON.parse(misty.Get("state_data"));
@@ -58,12 +62,19 @@ function _eye_contact(data)
 
 // Wake on key phrase event
 function StartKeyPhraseRecognition() {
-    misty.Debug("Starting key phrase recognition...");
-    // Starts Misty listening for the "Hey, Misty" key phrase
-    misty.StartKeyPhraseRecognition();
-    // Registers for KeyPhraseRecognized events
-    misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
-    misty.Debug("KeyPhraseRecognition started. Misty will play a sound and wave when she hears 'Hey Misty'.");
+    if (misty.Get("enable_keyphrase_recognition")== "true") {
+        misty.Debug("Starting key phrase recognition...");
+        // Starts Misty listening for the "Hey, Misty" key phrase
+        misty.StartKeyPhraseRecognition();
+        // Registers for KeyPhraseRecognized events
+ //       misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
+ //       misty.Debug("KeyPhraseRecognition started. Misty will play a sound and wave when she hears 'Hey Misty'.");
+    }
+    else  {
+        misty.Debug("Stopping key phrase recognition...");
+        // Starts Misty listening for the "Hey, Misty" key phrase
+        misty.StopKeyPhraseRecognition();
+    }
 }
 
 // Callback function to execute when Misty hears the key phrase
@@ -76,11 +87,6 @@ function _KeyPhraseRecognized() {
    var state_data = JSON.parse(misty.Get("state_data"));
    if (current_state == "sleep")
    {
-        if (misty.Get("enable_keyphrase_recognition")) {
-    // stop keyphrase detection and deregister callback
-            misty.UnregisterEvent("KeyPhraseRecognised");
-            misty.StopKeyPhraseRecognition();
-        }
         current_state = "normal";
         //state_data[next_state].time_out = 5000;
         //state_date[next_state].look_around = 5;
@@ -579,9 +585,10 @@ function stateMachine(current_state, state_data)
         {
             case "sleep":
                 // start keyphrase detection and register callback
-                if (misty.Get("enable_keyphrase_recogntion")) {
-                    StartKeyPhraseRecognition();    
-                }
+                //if (misty.Get("enable_keyphrase_recogntion")=="true") {
+                //    StartKeyPhraseRecognition();    
+                //}
+                StartKeyPhraseRecognition();
                 // reacting to touch
                 registerTouch();
     
@@ -607,10 +614,12 @@ function stateMachine(current_state, state_data)
                 registerFaceDetection();
                 // Starts Misty's face detection process, so we can register for
                 // (and receive) FaceRecognition event messages.
+                misty.StopKeyPhraseRecognition();
                 misty.StopFaceDetection(); // is this necessary?
                 misty.StartFaceDetection();
                 break;
             case "off":
+                misty.StopKeyPhraseRecognition();
                 misty.StopFaceDetection(); // is this necessary?
             default:
                 break;
