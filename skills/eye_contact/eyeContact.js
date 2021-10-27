@@ -47,16 +47,25 @@ function _eye_contact(data)
 {
     //if (data["guardian_command"] == "eye_contact")
     //{
-        let received = data["guardian_data"];
-        misty.Debug("External command received -> " + received);
-        //misty.Debug(JSON.stringify(data));
-        var the_data = JSON.stringify({event: "received"}); //"External command received -> " + received;
-        misty.TriggerEvent("guardian", "eyeContactSkill", the_data, "");
+    switch (data.Source)
+    {
+        case "sense_touch":
+            misty.Debug("External command received from " + data.Source + " -> " + data.sensor + " touched");
+            _Touched(data);
+            break;
+        case "cloud_connector":
+            misty.Debug("External command received from " + data.Source + " -> " + data.guardian_data);
+            //misty.Debug(JSON.stringify(data));
+            var the_data = JSON.stringify({"eye_contact": "on", "status": data.guardian_data}); //"External command received -> " + received;
+            misty.TriggerEvent("guardian", "eye_contact", the_data, "");
     
-        var current_state = misty.Get("state");
-        var state_data  = JSON.parse(misty.Get("state_data"));
+            var current_state = misty.Get("state");
+            var state_data  = JSON.parse(misty.Get("state_data"));
 
-        if (current_state != received) stateMachine(received, state_data);
+            if (current_state != data.guardian_data) stateMachine(data.guardian_data, state_data);
+            break;
+        default:
+    }
     //}
 }
 
@@ -106,7 +115,7 @@ function waveRightArm() {
 }
 
 
-// Respond to touch events
+/* // Respond to touch events
 function registerTouch()
 {
     misty.Debug("Registering Touch");
@@ -114,10 +123,10 @@ function registerTouch()
     misty.AddReturnProperty("Touched", "IsContacted");
     misty.RegisterEvent("Touched", "TouchSensor", 50 ,true);
 }
-
+ */
 function _Touched(data)
 {
-    var sensor = data.AdditionalResults[0];
+/*     var sensor = data.AdditionalResults[0];
     var isPressed = data.AdditionalResults[1];
 	isPressed ? misty.Debug(sensor+" is Touched") : misty.Debug(sensor+" is Released");
     
@@ -152,7 +161,7 @@ function _Touched(data)
         {
             misty.Debug("Sensor Name Unknown");
         }
-
+ */
         // wake up if sleeping
         var current_state = misty.Get("state");
         var state_data = JSON.parse(misty.Get("state_data"));
@@ -162,7 +171,7 @@ function _Touched(data)
             stateMachine(current_state, state_data);
             
         }
-    }
+//    }
 } 
 
 
@@ -590,7 +599,7 @@ function stateMachine(current_state, state_data)
                 //}
                 StartKeyPhraseRecognition();
                 // reacting to touch
-                registerTouch();
+//                registerTouch();
     
                 // Stop face recognition
                 misty.StopFaceDetection();
