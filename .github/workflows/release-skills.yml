@@ -22,6 +22,8 @@ jobs:
           path: listen_answers.zip
       - uses: ncipollo/release-action@v1
         with:
+          prerelease: true
+          tag: lastest
           artifacts: "dist/*"
           bodyFile: "README.md"
           token: ${{ secrets.GITHUB_TOKEN }}
