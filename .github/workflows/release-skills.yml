@@ -26,6 +26,7 @@ jobs:
   auto-release:
     name: "Auto Release"
     runs-on: ubuntu-latest
+    needs: prepare-artifacts
     steps:
       - uses: actions/checkout@v2
       # - uses: papeloto/action-zip@v1
