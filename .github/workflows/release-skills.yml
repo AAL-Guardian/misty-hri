@@ -19,14 +19,14 @@ jobs:
             - take_photo_to_position
     steps:
       - uses: actions/checkout@v2
-      # - uses: papeloto/action-zip@v1
-      #   with:
-      #     files: skills/${{ matrix.skill }}/
-      #     dest: dist/${{ matrix.skill }}.zip
+      - uses: papeloto/action-zip@v1
+        with:
+          files: skills/${{ matrix.skill }}/
+          dest: dist/${{ matrix.skill }}.zip
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.skill }}.zip
-          path: skills/${{ matrix.skill }}/
+          path: skills/${{ matrix.skill }}.zip
   auto-release:
     name: "Auto Release"
     runs-on: ubuntu-latest
