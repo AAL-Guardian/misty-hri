@@ -40,10 +40,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          path: skills/
+          path: skills-files/
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.date.outputs.date }}
-          artifacts: "skills/manifest.json,skills/*.zip"
+          artifacts: "skills/manifest.json,skills-files/*.zip"
           bodyFile: "README.md"
           token: ${{ secrets.GITHUB_TOKEN }}
