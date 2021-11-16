@@ -26,7 +26,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.skill }}.zip
-          path: skills/${{ matrix.skill }}.zip
+          path: dist/${{ matrix.skill }}.zip
   auto-release:
     name: "Auto Release"
     runs-on: ubuntu-latest
