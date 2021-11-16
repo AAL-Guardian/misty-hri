@@ -1,8 +1,7 @@
-misty.RegisterUserEvent("listen_answers", true);
+misty.RegisterUserEvent("take_photo", true);
 
-function _listen_answers(data) {
+function _take_photo(data) {
     //CONSTATS:
-    const filename = 'answerAudio.wav';
 
     // INPUT PARAMETERS
     const uploadUrl = data['upload_url'];
