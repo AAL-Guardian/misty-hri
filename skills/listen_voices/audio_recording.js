@@ -4,11 +4,14 @@ misty.RegisterUserEvent("record_audio", true);
 function _record_audio(data) {
     //CONSTATS:
     const filename = 'recordAudio.wav';
-    
+
     // INPUT PARAMETERS
-    data = JSON.parse(data);
-    const uploadUrl = data.upload_url;
-    const time = data.time || 10;
+    const command_data = JSON.parse(data.guardian_data);
+
+    const uploadUrl = command_data.upload_url;
+
+    const time = command_data.time || 0;
+    
 
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);
@@ -30,7 +33,6 @@ function _record_audio(data) {
 function afterAudioGet(data) {
     misty.Debug("afterAudioGet");
 
-    misty.Debug(misty.Get("currentUploadUrl"));
-
-    misty.SendExternalRequest("PUT", misty.Get("currentUploadUrl"), null, null, data.Result.ResponseObject.Data);
+    const upload_url = misty.Get("currentUploadUrl");
+    misty.SendExternalRequest("PUT", uploadUrl, null, null, data.Result.Base64);
 }
