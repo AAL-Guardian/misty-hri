@@ -33,7 +33,7 @@ jobs:
     needs: prepare-artifacts
     steps:
       - name: Get current date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M')"
         id: date
       - name: Echo current date
         run: echo "${{ steps.date.outputs.date }}"
