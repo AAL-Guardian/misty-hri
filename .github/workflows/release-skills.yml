@@ -44,6 +44,6 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.date.outputs.date }}
-          artifacts: "skills/manifest.json,skills/*.zip"
+          artifacts: "skills/manifest.json,skills/*.zip/*.zip"
           bodyFile: "README.md"
           token: ${{ secrets.GITHUB_TOKEN }}
