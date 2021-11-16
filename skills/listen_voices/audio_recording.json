@@ -1,16 +1,19 @@
 {
-    "Name": "record_audio",
-    "UniqueId": "c106e2d4-91ce-4e16-94d6-1cb28c398fb6",
-    "Description": "My skill is amazing!",
-    "StartupRules": [
-      "Manual",
-      "Robot"
-      
-    ],
-    "Language": "javascript",
-    "BroadcastMode": "verbose",
-    "TimeoutInSeconds": 1000000,
-    "CleanupOnCancel": true,
-    "WriteToLog": false,
-    "Parameters": { }
+  "Name": "audio_recording",
+  "UniqueId": "6ca82a95-01f2-4a85-b6e0-fc3480fef6cb",
+  "Description": "My skill is amazing!",
+  "StartupRules": [
+    "Manual",
+    "Robot"
+  ],
+  "Language": "javascript",
+  "BroadcastMode": "verbose",
+  "TimeoutInSeconds": 600,
+  "CleanupOnCancel": true,
+  "WriteToLog": false,
+  "Parameters": {
+    "int": 10,
+    "double": 20.5,
+    "string": "twenty"
   }
+}
