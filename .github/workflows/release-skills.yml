@@ -13,6 +13,10 @@ jobs:
         matrix:
           skill: 
             - listen_answers
+            - listen_voices
+            - speak_from_url
+            - eye_contact
+            - take_photo_to_position
     steps:
       - uses: actions/checkout@v2
       - uses: papeloto/action-zip@v1
@@ -28,15 +32,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: prepare-artifacts
     steps:
-      - name: set env
-        run: echo "::set-env name=NOW::$(date +'%Y-%m-%d')"
+      - name: Get current date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
           name: listen_answers.zip
       - uses: ncipollo/release-action@v1
         with:
-          tag: ${{ env.NOW }}
+          tag: ${{ steps.date.outputs.date }}
           artifacts: "skills/manifest.json,*.zip"
           bodyFile: "README.md"
           token: ${{ secrets.GITHUB_TOKEN }}
