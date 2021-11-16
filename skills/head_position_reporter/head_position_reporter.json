@@ -1,15 +1,19 @@
 {
-    "Name": "head_position_reporter",
-    "UniqueId": "ac409fec-a555-4022-a585-39503788b20f",
-    "Description": "Report Head position to the cloud",
-    "StartupRules": [
-      "Manual",
-      "Robot"
-    ],
-    "Language": "javascript",
-    "BroadcastMode": "verbose",
-    "TimeoutInSeconds": 1000000,
-    "CleanupOnCancel": true,
-    "WriteToLog": false,
-    "Parameters": {}
+  "Name": "head_position_reporter",
+  "UniqueId": "2f1e276b-66c4-442b-8c76-7a8dbb501ef9",
+  "Description": "My skill is amazing!",
+  "StartupRules": [
+    "Manual",
+    "Robot"
+  ],
+  "Language": "javascript",
+  "BroadcastMode": "verbose",
+  "TimeoutInSeconds": 600,
+  "CleanupOnCancel": true,
+  "WriteToLog": false,
+  "Parameters": {
+    "int": 10,
+    "double": 20.5,
+    "string": "twenty"
   }
+}
