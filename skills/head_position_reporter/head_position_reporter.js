@@ -1,5 +1,6 @@
 misty.RegisterUserEvent("enable_head_position_reporting", true);
 misty.RegisterUserEvent("disable_head_position_reporting", true);
+misty.RegisterUserEvent("head_position_reporting", true);
 
 function _enable_head_position_reporting() {
     misty.AddReturnProperty("ActuatorPosition", "SensorId");
@@ -10,6 +11,15 @@ function _enable_head_position_reporting() {
 
 function _disable_head_position_reporting() {
     misty.UnregisterEvent("ActuatorPosition");
+}
+
+function _head_position_reporting(data) {
+    if(data) {
+        _enable_head_position_reporting()
+    } else {
+        _disable_head_position_reporting()
+    }
+    
 }
 
 

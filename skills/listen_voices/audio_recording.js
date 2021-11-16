@@ -4,10 +4,11 @@ misty.RegisterUserEvent("record_audio", true);
 function _record_audio(data) {
     //CONSTATS:
     const filename = 'recordAudio.wav';
-
+    
     // INPUT PARAMETERS
-    const uploadUrl = data['upload_url'];
-    const time = data['time'] || 10;
+    data = JSON.parse(data);
+    const uploadUrl = data.upload_url;
+    const time = data.time || 10;
 
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);

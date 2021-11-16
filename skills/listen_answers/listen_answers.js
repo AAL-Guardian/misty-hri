@@ -5,8 +5,9 @@ function _listen_answers(data) {
     const filename = 'answerAudio.wav';
 
     // INPUT PARAMETERS
-    const uploadUrl = data['upload_url'];
-    const time = data['time'] || 5;
+    data = JSON.parse(data);
+    const uploadUrl = data.upload_url;
+    const time = data.time || 5;
 
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);

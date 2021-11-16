@@ -4,10 +4,11 @@ function _take_photo(data) {
     //CONSTATS:
 
     // INPUT PARAMETERS
-    const uploadUrl = data['upload_url'];
-    const head_position = data['head_position'];
-    head_position = parseInt(head_position); 
-    misty.Debug("head_position"); 
+    data = JSON.parse(data);
+    const uploadUrl = data.upload_url;
+    const head_position = data.head_position || 10;
+
+    misty.Debug("head_position" + head_position); 
     //const picture = "GuardianImage"
     
     // LOCAL VARIABLES
