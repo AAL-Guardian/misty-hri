@@ -19,14 +19,14 @@ jobs:
             - take_photo_to_position
     steps:
       - uses: actions/checkout@v2
-      - uses: papeloto/action-zip@v1
-        with:
-          files: skills/${{ matrix.skill }}/
-          dest: dist/${{ matrix.skill }}.zip
+      # - uses: papeloto/action-zip@v1
+      #   with:
+      #     files: skills/${{ matrix.skill }}/
+      #     dest: dist/${{ matrix.skill }}.zip
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.skill }}.zip
-          path: dist/${{ matrix.skill }}.zip
+          path: skills/${{ matrix.skill }}/
   auto-release:
     name: "Auto Release"
     runs-on: ubuntu-latest
@@ -44,6 +44,6 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.date.outputs.date }}
-          artifacts: "skills/manifest.json,skills/*.zip/*.zip"
+          artifacts: "skills/manifest.json,skills/*.zip"
           bodyFile: "README.md"
           token: ${{ secrets.GITHUB_TOKEN }}
