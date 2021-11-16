@@ -25,7 +25,7 @@ jobs:
           dest: dist/${{ matrix.skill }}.zip
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.skill }}.zip
+          name: skills/${{ matrix.skill }}.zip
           path: dist/${{ matrix.skill }}.zip
   auto-release:
     name: "Auto Release"
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: listen_answers.zip
+          name: skills/
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.date.outputs.date }}
