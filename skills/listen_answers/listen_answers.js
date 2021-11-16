@@ -1,13 +1,18 @@
 misty.RegisterUserEvent("listen_answers", true);
 
 function _listen_answers(data) {
+
     //CONSTATS:
     const filename = 'answerAudio.wav';
 
     // INPUT PARAMETERS
-    data = JSON.parse(data);
-    const uploadUrl = data.upload_url;
-    const time = data.time || 5;
+    const command_data = JSON.parse(data.guardian_data);
+
+    const uploadUrl = command_data.upload_url;
+
+    const time = command_data.time || 0;
+    
+   
 
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);
@@ -24,7 +29,14 @@ function _listen_answers(data) {
 function _GetAudioFile(data){
     // SEND FILE
     misty.Debug("Invio Audio");
-    misty.Debug(data);
-    misty.SendExternalRequest("PUT", misty.Get("currentUploadUrl"), null, null, data.Result.Base64);
-    misty.Debug("Audio Inviato");
+    misty.Debug(Object.keys(data.Result));
+    const uploadUrl = misty.Get("currentUploadUrl");
+    try {
+        misty.Debug(uploadUrl);
+        misty.SendExternalRequest("PUT", uploadUrl, null, null, data.Result.Base64);
+        misty.Debug("Audio Inviato");
+        } catch (e) {
+        misty.Debug(e)
+    }
+    
 }
