@@ -7,19 +7,35 @@ on:
       - release-test
 
 jobs:
+  prepare-artifacts:
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          skill: 
+            - listen_answers
+    steps:
+      - uses: actions/checkout@v2
+      - uses: papeloto/action-zip@v1
+        with:
+          files: skills/${{ matrix.skill }}/
+          dest: dist/${{ matrix.skill }}.zip
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.skill }}.zip
+          path: dist/${{ matrix.skill }}.zip
   auto-release:
     name: "Auto Release"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: papeloto/action-zip@v1
-        with:
-          files: skills/listen_answers/
-          dest: dist/listen_answers.zip
-      - uses: actions/upload-artifact@v2
-        with:
-          name: listen_answers.zip
-          path: listen_answers.zip
+      # - uses: papeloto/action-zip@v1
+      #   with:
+      #     files: skills/listen_answers/
+      #     dest: dist/listen_answers.zip
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: listen_answers.zip
+      #     path: dist/listen_answers.zip
       - uses: ncipollo/release-action@v1
         with:
           prerelease: true
