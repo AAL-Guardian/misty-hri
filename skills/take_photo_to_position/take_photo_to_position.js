@@ -1,26 +1,23 @@
 misty.RegisterUserEvent("take_photo", true);
 
 function _take_photo(data) {
-    //CONSTATS:
-
     // INPUT PARAMETERS
-    data = JSON.parse(data);
-    const uploadUrl = data.upload_url;
-    const head_position = data.head_position || 10;
-
-    misty.Debug("head_position" + head_position); 
+    const command_data = JSON.parse(data.guardian_data);
+    const uploadUrl = command_data.upload_url;
+    const head_position = command_data.head_position || 0;
     //const picture = "GuardianImage"
-    
+
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);
-    misty.Debug("Start the skill");
     misty.Debug("start movement");
     misty.MoveHeadDegrees(0, 0, head_position, 100);
     misty.Pause(3000);
-    misty.TakePicture("GuardianImage", 1600,1200,false,true); 
-    misty.Debug("take picture")
-    //START WORK
-    //MOVE TO POSITION
-    //TAKE PICTURE
-    misty.SendExternalRequest("PUT", misty.Get("currentUploadUrl"), null, null, data.Result.Base64);
+    misty.Debug("take picture");
+    misty.TakePicture("GuardianImage", 1600, 1200, false, true);
+}
+
+function _TakePicture(data) {
+    misty.Debug("taken picture");
+    const upload_url = misty.Get("currentUploadUrl");
+    misty.SendExternalRequest("PUT", upload_url, null, null, data.Result.Base64);
 }
