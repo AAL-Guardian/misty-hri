@@ -28,7 +28,7 @@ function _ActuatorPosition(data) {
     if (data.AdditionalResults[0] == 'ahy') {
         var headYaw = data.AdditionalResults[1];
         misty.UnregisterEvent("ActuatorPosition");
-        misty.TriggerEvent('guardian_command', 'head_position_changed', JSON.stringify(headYaw), 'head_position_reporter')
+        misty.TriggerEvent('guardian', 'head_position_changed', JSON.stringify(headYaw), 'head_position_reporter')
     }
 }
 
