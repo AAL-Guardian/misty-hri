@@ -4,7 +4,7 @@ misty.RegisterUserEvent("record_audio", true);
 function _record_audio(data) {
 
     // INPUT PARAMETERS
-    data = JSON.parse(data);
+    data = JSON.parse(data.guardian_data);
     const uploadUrl = data.upload_url;
     const time = data.time || 10;
     // LOCAL VARIABLES

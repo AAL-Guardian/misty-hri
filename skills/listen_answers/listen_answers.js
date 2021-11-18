@@ -7,12 +7,8 @@ function _listen_answers(data) {
 
     // INPUT PARAMETERS
     const command_data = JSON.parse(data.guardian_data);
-
     const uploadUrl = command_data.upload_url;
-
     const time = command_data.time || 0;
-    
-   
 
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);
@@ -29,7 +25,6 @@ function _listen_answers(data) {
 function _GetAudioFile(data){
     // SEND FILE
     misty.Debug("Invio Audio");
-    misty.Debug(Object.keys(data.Result));
     const uploadUrl = misty.Get("currentUploadUrl");
     try {
         misty.Debug(uploadUrl);
