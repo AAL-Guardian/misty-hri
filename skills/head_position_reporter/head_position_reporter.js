@@ -28,7 +28,7 @@ function _ActuatorPosition(data) {
         misty.Debug(data.AdditionalResults[1]);
         var headYaw = data.AdditionalResults[1];
         misty.UnregisterEvent("ActuatorPosition");
-        misty.TriggerEvent('skill_event', 'head_position_reporter', JSON.stringify(headYaw))
+        misty.TriggerEvent('guardian', 'head_position_reporter', JSON.stringify(headYaw), 'head_position_reporter')
     }
 }
 
