@@ -1,3 +1,4 @@
+_enable_head_position_reporting();
 misty.RegisterUserEvent("enable_head_position_reporting", true);
 misty.RegisterUserEvent("disable_head_position_reporting", true);
 misty.RegisterUserEvent("head_position_reporting", true);
@@ -22,14 +23,15 @@ function _head_position_reporting(data) {
     
 }
 
-
 function _ActuatorPosition(data) {
-    misty.Debug(data.AdditionalResults);
     if (data.AdditionalResults[0] == 'ahy') {
         var headYaw = data.AdditionalResults[1];
-        misty.UnregisterEvent("ActuatorPosition");
-        misty.TriggerEvent('guardian', 'head_position_changed', JSON.stringify(headYaw), 'head_position_reporter')
+        
+        const old = misty.Get("currentUploadUrl")
+        if(old != headYaw) {
+            misty.Debug('robot moved head', headYaw);
+            misty.Set("currentUploadUrl", headYaw, false);
+            misty.TriggerEvent('guardian', 'head_position_changed', JSON.stringify({headYaw}),"");
+        }
     }
 }
-
-_enable_head_position_reporting();
