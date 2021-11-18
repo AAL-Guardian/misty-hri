@@ -9,7 +9,7 @@ function _record_audio(data) {
     const time = data.time || 10;
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);
-
+    const filename = "localRecordingFile.wav";
     misty.Debug("Start Recording Audio");
     misty.SendExternalRequest("POST", "http://localhost/api/audio/raw/record/start", null, null, JSON.stringify({ filename }), true, false, null, null);
     //the pause command allow to determine the duration of the recorded audio signal. Modify the time to determine the duration 
