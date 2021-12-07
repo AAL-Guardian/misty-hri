@@ -50,9 +50,19 @@ function _eye_contact(data)
     switch (data.Source)
     {
         case "sense_touch":
-            misty.Debug("External command received from " + data.Source + " -> " + data.sensor + " touched");
-            _Touched(data);
+            misty.Debug("External command received from " + data.Source + " -> " + data.message );
+            _Touched();
             break;
+        case "listen_voices":
+            misty.Debug("External command received from " + data.Source + " -> " + data.message );
+            var current_state = misty.Get("state");
+            var state_data  = JSON.parse(misty.Get("state_data"));
+            
+            if (current_state == "sleep")
+            {
+                stateMachine("normal", state_data);
+            }
+            break;           
         case "cloud_connector":
             misty.Debug("External command received from " + data.Source + " -> " + data.guardian_data);
             //misty.Debug(JSON.stringify(data));
@@ -124,7 +134,7 @@ function registerTouch()
     misty.RegisterEvent("Touched", "TouchSensor", 50 ,true);
 }
  */
-function _Touched(data)
+function _Touched()
 {
 /*     var sensor = data.AdditionalResults[0];
     var isPressed = data.AdditionalResults[1];

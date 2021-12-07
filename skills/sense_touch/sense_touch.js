@@ -99,7 +99,7 @@ function _Touched(data)
             }
     
         misty.TriggerEvent("guardian", "sense_touch", message("on", sensor), "");
-        misty.TriggerEvent("eye_contact", "sense_touch", message("on", sensor), "");
+        misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"message" : "sensor_touched"}), "");
         misty.pause(100);
         }
     }
