@@ -13,11 +13,12 @@ jobs:
         matrix:
           skill: 
             - change_led
+            - eye_contact
             - head_position_reporter
             - listen_answers
             - listen_voices
+            - sense_touch
             - speak_from_url
-            - eye_contact
             - take_photo_to_position
             - volume_check
     steps:
@@ -48,5 +49,4 @@ jobs:
         with:
           tag: ${{ steps.date.outputs.date }}
           artifacts: "skills/manifest.json,skills-files/*.zip/*.zip"
-          bodyFile: "README.md"
           token: ${{ secrets.GITHUB_TOKEN }}
