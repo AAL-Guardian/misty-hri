@@ -92,9 +92,10 @@ function _eye_contact(data)
                     stateMachine(new_state, new_data);
                     break;
                 case "off":
-                    misty.Set("_skill_state", "off");
+                    misty.StopFaceDetection();
                     misty.UnregisterEvent("timeOutLogic");
-                    stateMachine(_current_state, _state_data); // invokes changeEyes()
+                    changeEyes();
+                    misty.Set("_skill_state", "off");
                     break;
                 case "sleep":
                     if (skill_state == "on")
@@ -410,7 +411,7 @@ function changeEyes()
 {
     skill_state = misty.Get("_skill_state");
     eye_state = JSON.parse(misty.Get("_eye_state"));
-    //misty.Debug("Entering change eyes: " + skill_state);
+    misty.Debug("Entering change eyes: " + skill_state + ", eye_state: " + JSON.stringify(eye_state));
     
     
     if (skill_state == "off")

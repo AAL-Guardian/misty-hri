@@ -17,18 +17,26 @@ function _time_out_logic(data)
     misty.RegisterTimerEvent("time_out_logic", 30000, false);   
 } */
 
+function message(the_message)
+{
+    return JSON.stringify({ "skill" : "listen_voices",
+                            "state" : _current_state,
+                            "message": the_message});
+}
+
 ////////////////////////////////////////
 /*       User events                  */
 ////////////////////////////////////////     
 function _listen_voices(data)
 {
      //let command = data["guardian_command"];    
-    let received = data["guardian_data"];
+    the_data = JSON.parse(data.guardian_data);
+    const received = the_data.command;
     misty.Debug("listen_voices: External command received -> " + received);
 
-    the_message = JSON.stringify({"message": received}); //echo what is received
+    the_message = message(received); //echo what is received
     misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud what is received
-    set_current_state(received); 
+    set_current_state(received, data); 
 }
 
 ////////////////////////////////////////
@@ -66,7 +74,7 @@ function afterAudioGet(data) {
 // Callback function to execute when Misty hears the key phrase
 function _KeyPhraseRecognized() {
     misty.Debug("Key phrase recognized!");
-    the_message = JSON.stringify({"message" : "key_phrase_detected"});
+    the_message = message("key_phrase_detected");
     misty.TriggerEvent("eye_contact", "listen_voices", the_message, "");
     misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud what is received
     waveRightArm();
@@ -127,7 +135,7 @@ function GetAudioFile(data){
 ////////////////////////////////////////
 /*          State machine             */
 ////////////////////////////////////////
-function set_current_state(received)
+function set_current_state(received, received_data)
 {
 
     switch (received)
@@ -147,7 +155,7 @@ function set_current_state(received)
                 misty.StopKeyPhraseRecognition();
                 misty.Pause(100);
                 _audio_recording = true;            
-                record_audio(data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
+                record_audio(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
                 _audio_recording = false;
                 misty.Pause(100);
                 misty.StartKeyPhraseRecognition();
@@ -161,17 +169,20 @@ function set_current_state(received)
                 old_state = _current_state;
                 misty.StopKeyPhraseRecognition();
                 misty.Pause(100);
-                _audio_recording = true;            
-                listen_answers(data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
+                _audio_recording = true;
+
+                listen_answers(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
+                
                 _audio_recording = false;
                 misty.Pause(100);
                 misty.StartKeyPhraseRecognition();
                 _current_state = old_state;
-                set_current_state(_current_state);
+                set_current_state(_current_state, received_data);
             }
             break;
         case "default":
             _current_state = received;
+            _current_data = received_data;
     
     }
 }
