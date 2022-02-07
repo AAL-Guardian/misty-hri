@@ -2,13 +2,13 @@
 
 misty.Debug("Sense touch skill has started.");
 
-_touch_active = true;
+misty.Set("_touch_active", true);
 
 startSkill();
 
-function message(status, sensor_name, is_pressed)
+function message(sensor_name)
 {
-    return JSON.stringify({"sense_touch": status, "sensor": sensor_name});
+    return JSON.stringify({"sensor": sensor_name});
 }
 
 function startSkill()
@@ -22,7 +22,7 @@ function startSkill()
 // Respond to User events
 function RegisterGuardianEvent(data)
 {
-    //misty.AddPropertyTest("guardian", "guardian_command", "==", "eye_contact", "string");
+    //misty.AddPropertyTest("guardian", "guardian_command", "==", "sense_touch", "string");
     //misty.AddReturnProperty("guardian", "guardian_data");
     misty.RegisterUserEvent("sense_touch", true);
 }
@@ -31,7 +31,7 @@ function _sense_touch(data)
 {
      //let command = data["guardian_command"];    
     let received = data["guardian_data"];
-    misty.Debug("External command received -> " + received);
+    misty.Debug("sense_touch: External command received -> " + received);
     
 
     
@@ -40,10 +40,10 @@ function _sense_touch(data)
         switch (received)
         {
             case "on":
-                _touch_active = true;
+                misty.Set("_touch_active", true);
                 break;
             case "off":
-                _touch_active = false;
+                misty.Set("_touch_active", false);
                 break;
             case "default":
         }
@@ -67,8 +67,8 @@ function _Touched(data)
 {
     var sensor = data.AdditionalResults[0];
     var isPressed = data.AdditionalResults[1];
-	isPressed ? misty.Debug(sensor+" is Touched") : misty.Debug(sensor+" is Released");
-    if (_touch_active)
+    isPressed ? misty.Debug(sensor+" is Touched") : misty.Debug(sensor+" is Released");
+    if (misty.Get("_touch_active"))
     {
         if (isPressed)
         {
@@ -98,10 +98,10 @@ function _Touched(data)
                     misty.Debug("Sensor Name '" + sensor + "' is unknown.");
             }
     
-        misty.TriggerEvent("guardian", "sense_touch", message("on", sensor), "");
-        misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"message" : "sensor_touched"}), "");
-        misty.pause(100);
+        //misty.Pause(100);
+        the_message = message(sensor);
+        misty.TriggerEvent("eye_contact", "sense_touch", the_message , "");
+        misty.TriggerEvent("guardian", "sense_touch", the_message, "");
         }
-    }
-    
+    }    
 } 

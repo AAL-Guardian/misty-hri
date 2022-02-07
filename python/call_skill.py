@@ -9,20 +9,31 @@ import requests
 import json
 
 robot_ip = '192.168.178.66'
-skill_id = "5d3e55e9-c878-4fbc-8d62-172fbdd9c48c"
+source = "MyRobotApplication"
+#skill_id = "5d3e55e9-c878-4fbc-8d62-172fbdd9c48c"
+#event_name = "eye_contact"
 
-def send_command(the_command):
+#skill_id = "0723e9a7-8e10-4931-b2a1-9a36b895a04c"
+#event_name = "sense_touch"
+
+skill_id = "6ca82a95-01f2-4a85-b6e0-fc3480fef6cb"
+event_name = "listen_voices"
+
+def send_command(the_command, the_event_name = event_name, the_source = source):
     resp = requests.post('http://'+robot_ip+'/api/skills/event',json={
         "Skill" : skill_id,
-        "EventName": "eye_contact",
+        "EventName": the_event_name,
         "Payload": { ##"guardian_command": "eye_contact",
                     "guardian_data": the_command},
-        "Source": "MyRobotApplication"})
+        "Source": the_source})
     return resp
 
-s=""
-while not s=="quit":
-    s=input("Give a command or type quit: ")
-    resp = send_command(s)
-    print(resp.json())
+done=False
+while not done:
+    s=raw_input("Give a command or type quit: ")
+    if s=="quit":
+        done=True
+    else:
+        resp = send_command(s)
+        print(resp.json())
 

@@ -1,13 +1,21 @@
-_current_state = "on";
-_current_data = "";
-_audio_recording = false;
-
 ////////////////////////////////////////
 /*       Initialisation               */
 //////////////////////////////////////// 
-misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
+_current_state = "on";
+_audio_recording = false;
+
+//misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
 misty.RegisterUserEvent("listen_voices", true);
-set_current_state(_current_state, _current_data);
+//misty.RegisterTimerEvent("time_out_logic", 30000, false);
+set_current_state(_current_state);
+/* 
+function _time_out_logic(data)
+{
+    //misty.Debug(">> " + _current_state);
+    set_current_state(_current_state);
+    // make sure the skill does not die
+    misty.RegisterTimerEvent("time_out_logic", 30000, false);   
+} */
 
 ////////////////////////////////////////
 /*       User events                  */
@@ -16,11 +24,11 @@ function _listen_voices(data)
 {
      //let command = data["guardian_command"];    
     let received = data["guardian_data"];
-    misty.Debug("External command received -> " + received);
-    the_message = JSON.stringify({"listen_voices": _listen_active, "received_command": received}); //echo what is received
+    misty.Debug("listen_voices: External command received -> " + received);
+
+    the_message = JSON.stringify({"message": received}); //echo what is received
     misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud what is received
-    
-    set_current_state(received, data);
+    set_current_state(received); 
 }
 
 ////////////////////////////////////////
@@ -58,8 +66,11 @@ function afterAudioGet(data) {
 // Callback function to execute when Misty hears the key phrase
 function _KeyPhraseRecognized() {
     misty.Debug("Key phrase recognized!");
-    misty.TriggerEvent("eye_contact", "listen_voices", JSON.stringify({"message" : "key_phrase_detected"}), "");
-    waveRightArm();   
+    the_message = JSON.stringify({"message" : "key_phrase_detected"});
+    misty.TriggerEvent("eye_contact", "listen_voices", the_message, "");
+    misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud what is received
+    waveRightArm();
+    set_current_state(_current_state); //registers key event again
 }
 
 // Helper function to wave Misty's arm
@@ -116,20 +127,23 @@ function GetAudioFile(data){
 ////////////////////////////////////////
 /*          State machine             */
 ////////////////////////////////////////
-function set_current_state(received, data)
+function set_current_state(received)
 {
 
     switch (received)
     {
         case "on":
+            misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
             misty.StartKeyPhraseRecognition();
             break;
         case "off":
             misty.StopKeyPhraseRecognition();
+            misty.UnregisterEvent("KeyPhraseRecognition");
             break;
         case "record_audio":
             if (!_audio_recording)
             {
+                old_state = _current_state;
                 misty.StopKeyPhraseRecognition();
                 misty.Pause(100);
                 _audio_recording = true;            
@@ -137,11 +151,14 @@ function set_current_state(received, data)
                 _audio_recording = false;
                 misty.Pause(100);
                 misty.StartKeyPhraseRecognition();
+                _current_state = old_state
+                set_current_state(_current_state);
             }
             break;
         case "listen_answers":
             if (!_audio_recording)
             {
+                old_state = _current_state;
                 misty.StopKeyPhraseRecognition();
                 misty.Pause(100);
                 _audio_recording = true;            
@@ -149,10 +166,12 @@ function set_current_state(received, data)
                 _audio_recording = false;
                 misty.Pause(100);
                 misty.StartKeyPhraseRecognition();
+                _current_state = old_state;
+                set_current_state(_current_state);
             }
             break;
         case "default":
-    }
-    _current_state = received;
+            _current_state = received;
     
+    }
 }

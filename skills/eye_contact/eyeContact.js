@@ -1,6 +1,6 @@
 // Sets Misty's arms and head to a neutral position, and prints a debug
 // message that the movement is underway.
-misty.Debug("Eye contact skill");
+misty.Debug("Starting Eye contact skill");
 
 startSkill();
 
@@ -17,24 +17,31 @@ function startSkill()
 
     initHeadPose();
 
-    _skill_state = "on";
-    _current_state = "normal"; //create a default state variable on Misty
-    _default_data = { "sleep":{"time_out":300000},
-                        "normal":{"time_out":15000, "look_around":5},
-                        "alert":{"time_out":5000, "look_around":10}
+    skill_state = "on";
+    default_data = {   "sleep" :{"time_out":300000},
+                        "normal":{"time_out":20000  , "look_around":5},
+                        "alert" :{"time_out":10000   , "look_around":5}
                     };
-    _state_data =  _default_data[_current_state];                    
+    eye_state = {   "image":"e_DefaultContent.jpg",
+                    "blinking": true};
     
+    misty.Set("_skill_state", skill_state);
+    misty.Set("_current_state", "init"); //create a empty state variable on Misty
+    misty.Set("_default_data", JSON.stringify(default_data));
+    misty.Set("_state_data", JSON.stringify({}));
+    misty.Set("_eye_state",JSON.stringify(eye_state));
     RegisterGuardianEvent();
-    misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
-    misty.Debug("KeyPhraseRecognition started. Misty will play a sound and wave when she hears 'Hey Misty'.");
+    //misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
+    //misty.Debug("KeyPhraseRecognition started. Misty will play a sound and wave when she hears 'Hey Misty'.");
     // read actuator values
     registerYaw();
     registerPitch();
-    registerRoll(); 
+    registerRoll();
+    registerFaceDetection(); 
 
-
-    stateMachine(_current_state, _state_data); // sets and stores new state
+    current_state = "sleep"; //create a default state variable on Misty
+    state_data = default_data[current_state];
+    stateMachine(current_state, state_data); // sets and stores new state
 }
 
 // Respond to User events
@@ -49,20 +56,29 @@ function _eye_contact(data)
 {
     //if (data["guardian_command"] == "eye_contact")
     //{
+   // misty.Debug(JSON.stringify(data));
+    misty.Debug("eye_contact: External command received from Source -> " + data.Source + ", Event -> " + data.EventName);
+    skill_state = misty.Get("_skill_state");
+    current_state = misty.Get("_current_state");
+    state_data = JSON.parse(misty.Get("_state_data"));
+    default_data = JSON.parse(misty.Get("_default_data"));
+  
     switch (data.Source)
     {
         case "sense_touch":
         case "listen_voices":
-            misty.Debug("External command received from " + data.Source + " -> " + data.message );
+            //misty.Debug("wake up: External command received from: " + data.Source + " -> " + data.sensor );
             // wake up
-            if (_current_state == "sleep")
+            if (current_state == "sleep")
             {
                 new_state = "normal";
-                new_data = _default_state[new_state];
+                new_data = default_data[new_state];
+                misty.Debug("new state: " + new_state + ", new_data: " + JSON.stringify(new_data));
                 stateMachine(new_state, new_data);
             }
             break;           
         case "cloud_connector":
+        case "MyRobotApplication":
             // the AWS system can turn the eye contact skill on or off. When turned on, misty wakes up if asleep.
             misty.Debug("External command received from " + data.Source + " -> " + data.guardian_data);
             //misty.Debug(JSON.stringify(data));
@@ -70,16 +86,23 @@ function _eye_contact(data)
             switch (data.guardian_data)
             {
                 case "on":
-                    _skill_state = "on";
+                    misty.Set("_skill_state", "on");
                     new_state = "normal"; // revert to normal alertness level and wake-up if asleep
-                    new_data = _default_state[new_state];
+                    new_data = default_data[new_state];
                     stateMachine(new_state, new_data);
                     break;
                 case "off":
-                    _skill_data = "off";
+                    misty.Set("_skill_state", "off");
                     misty.UnregisterEvent("timeOutLogic");
                     stateMachine(_current_state, _state_data); // invokes changeEyes()
                     break;
+                case "sleep":
+                    if (skill_state == "on")
+                    {
+                        new_state = "sleep";
+                        new_data = default_data[new_state];
+                        stateMachine(new_state, new_data);
+                    }
             }
             
             var the_data = JSON.stringify({"eye_contact": data.guardian_data}); //"External command received -> " + received;
@@ -238,7 +261,7 @@ function _FaceDetect(data) {
     let bearing = data.AdditionalResults[1];
     let elevation = data.AdditionalResults[2];
     let distance = data.AdditionalResults[3];
-   // misty.Debug("Label: " + label + ", Bearing: " + bearing+ ", Elevation: " + elevation+ ", Distance: " + distance);
+    //misty.Debug("Label: " + label + ", Bearing: " + bearing+ ", Elevation: " + elevation+ ", Distance: " + distance);
 
     
     const headYaw = misty.Get("headYaw");
@@ -289,14 +312,21 @@ function _FaceDetect(data) {
         //state_date[next_state].look_around = 5;
     }
 */  
-    if (_current_state == "normal")
+    current_state = misty.Get("_current_state");
+    default_data = JSON.parse(misty.Get("_default_data"));
+    state_data = JSON.parse(misty.Get("_state_data"));
+
+    switch (current_state)
     {
-        new_state = "alert";
-        new_data = _default_data[new_state];
-    }
-    else{
-        new_state = _current_state;
-        new_data = _state_data;
+        case "normal":
+        case "alert": // resets lookout behaviour
+            new_state = "alert";
+            new_data = default_data[new_state];
+            break;
+        //case "sleep": // should not be possible as face detection is off in this state
+        default:
+            new_state = current_state;
+            new_data = state_data;
     }
     stateMachine(new_state, new_data); // updates eyes and registers events based on the state
     
@@ -378,78 +408,101 @@ function getRandomInt(min, max)
 
 function changeEyes()
 {
-    if (_skill_state == "off")
+    skill_state = misty.Get("_skill_state");
+    eye_state = JSON.parse(misty.Get("_eye_state"));
+    //misty.Debug("Entering change eyes: " + skill_state);
+    
+    
+    if (skill_state == "off")
     {
         misty.ChangeLED(0, 0, 0); // Changes LED to off
-        misty.DisplayImage("e_DefaultContent.jpg"); // Show default eyes
-        misty.SetBlinking(true); // turn blinking on
+        new_image = "e_DefaultContent.jpg";
+        new_blink = true;
     }
-    else if (_skill_state == "on")
+    else if (skill_state == "on")
     {
-        switch(_current_state)
+        current_state = misty.Get("_current_state");
+        switch(current_state)
         {
             case "sleep":
                 misty.ChangeLED(0, 0, 0); // Changes LED to off
-                misty.DisplayImage("e_Sleeping.jpg"); // Show sleeping eyes
-                misty.SetBlinking(false);  // turn blinking off
+                new_image = "e_Sleeping.jpg"; // Show sleeping eyes
+                new_blink = false;  // turn blinking off
                 break;
             case "normal":
-                misty.ChangeLED(255, 255, 255); // Changes LED to white
-                misty.DisplayImage("e_DefaultContent.jpg"); // Show default eyes
-                misty.SetBlinking(true);
+                misty.ChangeLED(0, 255, 255); // Changes LED to white
+                new_image = "e_DefaultContent.jpg"; // Show default eyes
+                new_blink =true;
                 break;
             case "alert":
                 misty.ChangeLED(0, 255, 0); // Changes LED to green
-                misty.DisplayImage("e_Joy.jpg"); // Show default eyes
-                misty.SetBlinking(true);
+                new_image = "e_Joy.jpg"; // Show default eyes
+                new_blink = true;
                 break;
             default:
                 misty.ChangeLED(148, 0, 211); // Changes LED to purple
-                misty.DisplayImage("e_Surprise.jpg"); // Show default eyes
-                misty.SetBlinking(true);
+                new_image = "e_Surprise.jpg"; // Show default eyes
+                new_blink = true;
                 break;
         }
     }
+    if (eye_state.image != new_image) // necessary to prevent flashing due to repeated calls
+    {
+        misty.DisplayImage(new_image); // Change eyes
+        eye_state.image = new_image;
+    }
+    if (eye_state.blinking != new_blink)
+    {
+        misty.SetBlinking(new_blink); // turn blinking on/off
+        eye_state.blinking = new_blink;
+    }
+    misty.Set("_eye_state", JSON.stringify(eye_state));
 }
 
 // callback for timer event
 function _timeOutLogic(callbackData)
 {
     // by default the new state is the same as the current state
-    new_state = _current_state;
-    new_data = _state_data;
-    switch (_current_state)
+    current_state = misty.Get("_current_state");
+    state_data = JSON.parse(misty.Get("_state_data"));
+    skill_state = misty.Get("_skill_state");
+    default_data  = JSON.parse(misty.Get("_default_data"));
+
+    //misty.Debug("Entering time_out logic: " + current_state + " , " + JSON.stringify(state_data));
+    new_state = current_state;
+    new_data = state_data;
+    switch (current_state)
     {
         case "sleep":
             // misty wakes after sleeping for 10 min
             new_state = "normal";
-            new_data = _default_data[new_state];
+            new_data = default_data[new_state];
             break;
         case "normal":
             // no faces detected, look around a few minutes then go to sleep
-            if (_state_data[_current_state].look_around > 0)
+            if (new_data.look_around > 0)
             {
                 lookSidetoSide();
-                _state_data[_current_state].look_around -=1;
+                new_data.look_around -=1;
             }
             else
             {
                 initHeadPose();  
                 new_state = "sleep";
-                new_data = _default_data[new_state];
+                new_data = default_data[new_state];
             }
             break;
         case "alert":
             // face no longer detected, start looking around or go back to normal
-            if (_state_data[_current_state].look_around > 0)
+            if (new_data.look_around > 0)
             {
                 lookSidetoSide();
-                _state_data[_current_state].look_around -=1;
+                new_data.look_around -=1;
             }
             else
             {
                 new_state = "normal";
-                new_data = _default_data[new_state];
+                new_data = default_data[new_state];
             }
             break;
         default:
@@ -460,9 +513,15 @@ function _timeOutLogic(callbackData)
 
 function stateMachine(new_state, new_data)
 {   
-    if (new_state != _current_state)
+    //misty.Debug("Entering state machine: " + new_state);
+    //misty.Debug(JSON.stringify(new_data));
+    current_state = misty.Get("_current_state");
+    state_data = JSON.parse(misty.Get("_state_data"));
+    skill_state = misty.Get("_skill_state");
+
+    
+    if (new_state != current_state)
     {
-       
         switch (new_state)
         {
             case "sleep":
@@ -476,9 +535,8 @@ function stateMachine(new_state, new_data)
                 //misty.UnregisterEvent("headRoll"); 
     
                 break;
-            case "normal":
+            case "normal":            
             case "alert":
-            
                 // start face recognition
 //                registerFaceDetection();
                 // Starts Misty's face detection process, so we can register for
@@ -488,20 +546,24 @@ function stateMachine(new_state, new_data)
                 break;
             default:
                 break;
-            }
-            _current_state = new_state;
-            _state_data = new_data;
-    
+        }
     }
+    
+    misty.Set("_current_state", new_state);
+    misty.Set("_state_data", JSON.stringify(new_data));
+    
+    
     changeEyes(); // the eyes reflect the state of the robot
-
-    // Registers for a timer event to invoke the _timeoutToNormal
-    // callback function after 5000 milliseconds.
-    if (_skill_state != "off")
+    
+    if (skill_state != "off")
     {
-        let time_out  = _state_data[_current_state].time_out;
-        misty.Debug("state -> " + _current_state + "    time_out = " + time_out);
-        misty.RegisterTimerEvent("timeOutLogic", time_out, false);
+        // Registers for a timer event to invoke the _timeoutToNormal
+    // callback function after 5000 milliseconds.
+    
+        //misty.Debug("time_out in _state_data and new_data: " + _state_data.time_out);
+        misty.Debug("state -> " + new_state + ", time_out -> " + new_data.time_out + ", look_around -> " + new_data.look_around);
+        misty.UnregisterEvent("timeOutLogic");
+        misty.RegisterTimerEvent("timeOutLogic", new_data.time_out, false);
     }
 }
 
