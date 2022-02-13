@@ -34,8 +34,8 @@ function _listen_voices(data)
     const received = the_data.command;
     misty.Debug("listen_voices: External command received -> " + received);
 
-    the_message = message(received); //echo what is received
-    misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud what is received
+    the_message = message("command received");
+    misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud a message is received
     set_current_state(received, data); 
 }
 
@@ -154,8 +154,10 @@ function set_current_state(received, received_data)
                 old_state = _current_state;
                 misty.StopKeyPhraseRecognition();
                 misty.Pause(100);
-                _audio_recording = true;            
+                _audio_recording = true;
+
                 record_audio(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
+                
                 _audio_recording = false;
                 misty.Pause(100);
                 misty.StartKeyPhraseRecognition();
@@ -164,6 +166,7 @@ function set_current_state(received, received_data)
             }
             break;
         case "listen_answers":
+            //misty.Debug("> "+ _audio_recording+ ", "+ _current_state +", "+ received + ", "+ JSON.stringify(received_data));
             if (!_audio_recording)
             {
                 old_state = _current_state;

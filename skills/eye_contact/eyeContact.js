@@ -45,6 +45,13 @@ function startSkill()
 }
 
 // Respond to User events
+function message(the_message)
+{
+    return JSON.stringify({ "skill" : "eye_contact",
+                            "state" : misty.Get("_skill_state"),
+                            "message": the_message});
+}
+
 function RegisterGuardianEvent(data)
 {
     //misty.AddPropertyTest("guardian", "guardian_command", "==", "eye_contact", "string");
@@ -106,8 +113,8 @@ function _eye_contact(data)
                     }
             }
             
-            var the_data = JSON.stringify({"eye_contact": data.guardian_data}); //"External command received -> " + received;
-            misty.TriggerEvent("guardian", "eye_contact", the_data, "");
+            var the_message = message("command received"); //"External command received"
+            misty.TriggerEvent("guardian", "eye_contact", the_message, "");
             break;
         default:
             break;
@@ -431,7 +438,7 @@ function changeEyes()
                 new_blink = false;  // turn blinking off
                 break;
             case "normal":
-                misty.ChangeLED(0, 255, 255); // Changes LED to white
+                misty.ChangeLED(255, 255, 255); // Changes LED to white
                 new_image = "e_DefaultContent.jpg"; // Show default eyes
                 new_blink =true;
                 break;
@@ -520,7 +527,8 @@ function stateMachine(new_state, new_data)
     state_data = JSON.parse(misty.Get("_state_data"));
     skill_state = misty.Get("_skill_state");
 
-    
+    if (skill_state != "off")
+    {    
     if (new_state != current_state)
     {
         switch (new_state)
@@ -548,22 +556,23 @@ function stateMachine(new_state, new_data)
             default:
                 break;
         }
+        misty.Set("_current_state", new_state);
     }
     
-    misty.Set("_current_state", new_state);
-    misty.Set("_state_data", JSON.stringify(new_data));
-    
+    if (state_data != new_data)
+    {
+        misty.Set("_state_data", JSON.stringify(new_data));
+    };
     
     changeEyes(); // the eyes reflect the state of the robot
     
-    if (skill_state != "off")
-    {
+    
         // Registers for a timer event to invoke the _timeoutToNormal
     // callback function after 5000 milliseconds.
     
         //misty.Debug("time_out in _state_data and new_data: " + _state_data.time_out);
         misty.Debug("state -> " + new_state + ", time_out -> " + new_data.time_out + ", look_around -> " + new_data.look_around);
-        misty.UnregisterEvent("timeOutLogic");
+//        misty.UnregisterEvent("timeOutLogic");
         misty.RegisterTimerEvent("timeOutLogic", new_data.time_out, false);
     }
 }
