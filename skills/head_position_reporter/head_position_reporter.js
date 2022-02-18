@@ -7,7 +7,7 @@ function _enable_head_position_reporting() {
     misty.AddReturnProperty("ActuatorPosition", "SensorId");
     misty.AddReturnProperty("ActuatorPosition", "Value");
     misty.AddPropertyTest("ActuatorPosition", "SensorId", "==", "ahy", "string");
-    misty.RegisterEvent("ActuatorPosition", "ActuatorPosition", 1000, true);
+    misty.RegisterEvent("ActuatorPosition", "ActuatorPosition", 5000, true);
 }
 
 function _disable_head_position_reporting() {
