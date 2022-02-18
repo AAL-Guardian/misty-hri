@@ -17,6 +17,7 @@ jobs:
             - head_position_reporter
             - listen_answers
             - listen_voices
+            - old_listen_voices
             - speak_to_user
             - sense_touch
             - speak_from_url
