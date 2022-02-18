@@ -104,7 +104,7 @@ function listen_answers(data) {
     // INPUT PARAMETERS
     const command_data = JSON.parse(data.guardian_data);
     const uploadUrl = data.upload_url;
-    const time = data.time || 0;
+    const time = data.time || 5;
 
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);
