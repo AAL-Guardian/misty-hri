@@ -143,10 +143,12 @@ function set_current_state(received, received_data)
         case "on":
             misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
             misty.StartKeyPhraseRecognition();
+            _current_state = "on";
             break;
         case "off":
             misty.StopKeyPhraseRecognition();
             misty.UnregisterEvent("KeyPhraseRecognition");
+            _current_state = "off";
             break;
         case "record_audio":
             if (!_audio_recording)
@@ -154,15 +156,16 @@ function set_current_state(received, received_data)
                 old_state = _current_state;
                 misty.StopKeyPhraseRecognition();
                 misty.Pause(100);
+                _current_state = "record_audio";
                 _audio_recording = true;
 
                 record_audio(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
                 
-                _audio_recording = false;
                 misty.Pause(100);
                 misty.StartKeyPhraseRecognition();
-                _current_state = old_state
-                set_current_state(_current_state);
+                _current_state = old_state;
+                _audio_recording = false;
+                set_current_state(_current_state, received_data);
             }
             break;
         case "listen_answers":
@@ -172,20 +175,18 @@ function set_current_state(received, received_data)
                 old_state = _current_state;
                 misty.StopKeyPhraseRecognition();
                 misty.Pause(100);
+                _current_state = "listen_answers";
                 _audio_recording = true;
 
                 listen_answers(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
                 
-                _audio_recording = false;
                 misty.Pause(100);
                 misty.StartKeyPhraseRecognition();
                 _current_state = old_state;
+                _audio_recording = false;
                 set_current_state(_current_state, received_data);
             }
             break;
-        case "default":
-            _current_state = received;
-            _current_data = received_data;
-    
+        case "default":    
     }
 }
