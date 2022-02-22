@@ -418,7 +418,7 @@ function changeEyes()
 {
     skill_state = misty.Get("_skill_state");
     eye_state = JSON.parse(misty.Get("_eye_state"));
-    misty.Debug("Entering change eyes: " + skill_state + ", eye_state: " + JSON.stringify(eye_state));
+    //misty.Debug("Entering change eyes: " + skill_state + ", eye_state: " + JSON.stringify(eye_state));
     
     
     if (skill_state == "off")
