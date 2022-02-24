@@ -50,5 +50,5 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.date.outputs.date }}
-          artifacts: "skills/manifest.json,skills-files/*.zip/*.zip"
+          artifacts: "skills-files/*.zip/*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
