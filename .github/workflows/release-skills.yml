@@ -16,9 +16,9 @@ jobs:
             - eye_contact
             - head_position_reporter
             - listen_answers
-            - listen_voices
+            # - listen_voices
             - old_listen_voices
-            - speak_to_user
+            # - speak_to_user
             - sense_touch
             - speak_from_url
             - take_photo_to_position
