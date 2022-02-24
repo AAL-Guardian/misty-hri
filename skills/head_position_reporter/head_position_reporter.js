@@ -27,10 +27,10 @@ function _ActuatorPosition(data) {
     if (data.AdditionalResults[0] == 'ahy') {
         var headYaw = data.AdditionalResults[1];
         
-        const old = misty.Get("currentUploadUrl")
+        const old = misty.Get("current_head_position")
         if(old != headYaw) {
             misty.Debug('robot moved head', headYaw);
-            misty.Set("currentUploadUrl", headYaw, false);
+            misty.Set("current_head_position", headYaw, false);
             misty.TriggerEvent('guardian', 'head_position_changed', JSON.stringify({headYaw}),"");
         }
     }
