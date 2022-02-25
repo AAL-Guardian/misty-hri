@@ -12,7 +12,7 @@ function _listen_answers(data) {
 
     // LOCAL VARIABLES
     misty.Set("currentUploadUrl", uploadUrl, false);
-    
+
     // START WORK
     misty.Debug("Start Recording Audio Answer");
     misty.StartRecordingAudio(filename, 0, time * 1000)
@@ -22,7 +22,7 @@ function _listen_answers(data) {
     misty.GetAudioFile(filename);
 }
 
-function _GetAudioFile(data){
+function _GetAudioFile(data) {
     // SEND FILE
     misty.Debug("Invio Audio");
     const uploadUrl = misty.Get("currentUploadUrl");
@@ -32,6 +32,6 @@ function _GetAudioFile(data){
         misty.Debug("Audio Inviato");
     } catch (e) {
         misty.Debug(e)
-}
-    
+    }
+
 }
