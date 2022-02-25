@@ -11,9 +11,9 @@ function _record_audio(data) {
     misty.Set("currentUploadUrl", uploadUrl, false);
     const filename = "test_raw_audio_file.wav";
     misty.Debug("Start Recording Audio");
-    misty.SendExternalRequest("POST", "http://localhost/api/audio/raw/record/start", null, null, JSON.stringify({ filename }), true, false, null, null);
+    misty.SendExternalRequest("POST", "http://localhost/api/audio/raw/record/start", null, null, JSON.stringify({ filename }), true, false, null, null, null, null, null, 0, time * 1000);
     //the pause command allow to determine the duration of the recorded audio signal. Modify the time to determine the duration 
-    misty.Pause(time * 1000);
+    // misty.Pause(time * 1000);
     misty.Debug("audio registrato!!");
     misty.StopRecordingAudio();
     misty.Debug("stop recording audio");
