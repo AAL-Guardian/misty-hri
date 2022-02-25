@@ -15,8 +15,8 @@ function _listen_answers(data) {
     
     // START WORK
     misty.Debug("Start Recording Audio Answer");
-    misty.StartRecordingAudio(filename)
-    misty.Pause(time * 1000);
+    misty.StartRecordingAudio(filename, 0, time * 1000)
+    // misty.Pause(time * 1000);
     misty.StopRecordingAudio();
     misty.Debug("audio registrato!!");
     misty.GetAudioFile(filename);
@@ -30,8 +30,8 @@ function _GetAudioFile(data){
         misty.Debug(uploadUrl);
         misty.SendExternalRequest("PUT", uploadUrl, null, null, data.Result.Base64);
         misty.Debug("Audio Inviato");
-        } catch (e) {
+    } catch (e) {
         misty.Debug(e)
-    }
+}
     
 }
