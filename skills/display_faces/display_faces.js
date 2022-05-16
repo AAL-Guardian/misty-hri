@@ -9,18 +9,17 @@ misty.Set("_current_state",JSON.stringify({"image": null,
                "blinking": null,
                "time_out": null}));
 
-misty.Debug("step 2");
+
 change_face(_default_eye_state);
 
 
-misty.Debug("step 3");
 RegisterGuardianEvent();
 
 // Respond to User events
 function message(the_message)
 {
     return JSON.stringify({ "skill" : "display_faces",
-                            "state" : JSON.stringify(_current_state),
+                            "state" : JSON.parse(misty.Get("_current_state")),
                             "message": the_message});
 }
 
@@ -34,23 +33,19 @@ function RegisterGuardianEvent()
 // callback for timer event
 function _time_out(callbackData)
 {
+    misty.Debug("display_faces: time_out event received");
+    _default_eye_state = {"image":"e_DefaultContent.jpg",
+    //               "led_color":{"red":255,"green":255,"blue":255},
+                   "blinking":true,
+                   "time_out": 0};
     change_face(_default_eye_state);
 }
 
 
 function change_face(new_state)
 {
-    //eye_state = JSON.parse(misty.Get("_eye_state"));
-    //misty.Debug("Entering change eyes: " + skill_state + ", eye_state: " + JSON.stringify(eye_state));
-    //misty.Debug("new_state.image    -> "+ new_state.image);
-    //misty.Debug("new_state.blinking -> "+ new_state.blinking);
-    //misty.Debug("new_state.time_out -> "+ new_state.time_out);
-
     _current_state = JSON.parse(misty.Get("_current_state"));
-   // misty.Debug(misty.Get("_current_state") + ", " + _current_state);
-   // misty.Debug("_current_state.image    -> "+ _current_state.image);
-   // misty.Debug("_current_state.blinking -> "+ _current_state.blinking);
-   // misty.Debug("_current_state.time_out -> "+ _current_state.time_out);
+
     if (_current_state.image != new_state.image) // necessary to prevent flashing due to repeated calls
     {
         misty.DisplayImage(new_state.image); // Change eyes
@@ -61,9 +56,8 @@ function change_face(new_state)
         misty.SetBlinking(new_state.blinking); // turn blinking on/off
         _current_state.blinking = new_state.blinking;
     }
-//    misty.ChangeLED(new_state.led_color.red, new_state.led_color.green, new_state.led_color.blue); // Changes LED to white
     
-    //misty.Set("_eye_state", JSON.stringify(eye_state));
+    misty.Set("_current_state", JSON.stringify(_current_state));
 }
 
 function _display_faces(data)
@@ -72,7 +66,6 @@ function _display_faces(data)
     //{
    // misty.Debug(JSON.stringify(data));
     misty.Debug("display_faces: External command received from Source -> " + data.Source + ", Event -> " + data.EventName);
-    misty.Debug("display_faces: guardian_data: " + data.guardian_data.image + " " + data.guardian_data.blinking);
     let received = data["guardian_data"];
 
     switch (data.Source)
@@ -85,7 +78,7 @@ function _display_faces(data)
             change_face(received);
             if (received.time_out > 0)
             {
-                misty.RegisterTimerEvent("time_out", received.time_out, false);
+                misty.RegisterTimerEvent("time_out", received.time_out * 1000, false);
             }
 
             var the_message = message("command received"); //"External command received"
