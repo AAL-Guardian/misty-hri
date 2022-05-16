@@ -1,6 +1,6 @@
 // Registers touch skill of Misty and sends events to the internal bus and listens to events from the cloud
 
-misty.Debug("Sense touch skill has started.");
+misty.Debug("Sense_touch skill has started.");
 
 misty.Set("_touch_active", true);
 
@@ -78,12 +78,15 @@ function _Touched(data)
         if (isPressed)
         {
             _last_sensor = {"sensor":sensor, "is_pressed":true, "time_stamp":created};
+            misty.Set("_last_sensor", JSON.stringify(_last_sensor));
 
             switch (sensor)
             {
                 case "Chin":
                     //misty.Speak("That tickles.");
                     misty.PlayAudio("010-Uhm.wav");
+                    the_message = JSON.stringify({"image":"e_Pride.jpg","blinking":true, "time_out":5});
+                    misty.TriggerEvent("display_faces", "sense_touch", the_message, "");
                     break;
                 case "HeadRight":
                     misty.PlayAudio("010-Uhm.wav");
@@ -111,11 +114,13 @@ function _Touched(data)
         }
         else
         {
+            _last_sensor = JSON.parse(misty.Get("_last_sensor"));
             if (sensor == _last_sensor.sensor)
             {
                 current_time = created;
                 last_time = _last_sensor.time_stamp;
-                if (current_time-last_tame > 3)
+                misty.Debug("last time -> "+last_time);
+                if (current_time-last_time > 3)
                 {
                     // goto sleep mode
                     the_message = message("sleep_activated", sensor);
@@ -125,6 +130,6 @@ function _Touched(data)
             }
         }
 
-        }
-    }    
-} 
+    }
+}    
+

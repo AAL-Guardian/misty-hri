@@ -1,0 +1,19 @@
+{
+  "Name": "take_photo_to_position",
+  "UniqueId": "7d6a3ac7-6af3-4dd9-990c-49a4ddddcb61",
+  "Description": "My skill is amazing!",
+  "StartupRules": [
+    "Manual",
+    "Robot"
+  ],
+  "Language": "javascript",
+  "BroadcastMode": "verbose",
+  "TimeoutInSeconds": 600,
+  "CleanupOnCancel": true,
+  "WriteToLog": false,
+  "Parameters": {
+    "int": 10,
+    "double": 20.5,
+    "string": "twenty"
+  }
+}
