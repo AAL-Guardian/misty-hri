@@ -1,11 +1,20 @@
+misty.Debug("display_faces skill has started.");
 _default_eye_state = {"image":"e_DefaultContent.jpg",
  //               "led_color":{"red":255,"green":255,"blue":255},
                 "blinking":true,
                 "time_out": 0};
+           
+misty.Set("_current_state",JSON.stringify({"image": null,
+//               "led_color":null,
+               "blinking": null,
+               "time_out": null}));
 
-_current_state = {};
+misty.Debug("step 2");
+change_face(_default_eye_state);
 
-change_face(_default_state);
+
+misty.Debug("step 3");
+RegisterGuardianEvent();
 
 // Respond to User events
 function message(the_message)
@@ -15,7 +24,7 @@ function message(the_message)
                             "message": the_message});
 }
 
-function RegisterGuardianEvent(data)
+function RegisterGuardianEvent()
 {
     //misty.AddPropertyTest("guardian", "guardian_command", "==", "eye_contact", "string");
     //misty.AddReturnProperty("guardian", "guardian_data");
@@ -25,7 +34,7 @@ function RegisterGuardianEvent(data)
 // callback for timer event
 function _time_out(callbackData)
 {
-    change_face(_default_state)
+    change_face(_default_eye_state);
 }
 
 
@@ -33,7 +42,15 @@ function change_face(new_state)
 {
     //eye_state = JSON.parse(misty.Get("_eye_state"));
     //misty.Debug("Entering change eyes: " + skill_state + ", eye_state: " + JSON.stringify(eye_state));
-    
+    //misty.Debug("new_state.image    -> "+ new_state.image);
+    //misty.Debug("new_state.blinking -> "+ new_state.blinking);
+    //misty.Debug("new_state.time_out -> "+ new_state.time_out);
+
+    _current_state = JSON.parse(misty.Get("_current_state"));
+   // misty.Debug(misty.Get("_current_state") + ", " + _current_state);
+   // misty.Debug("_current_state.image    -> "+ _current_state.image);
+   // misty.Debug("_current_state.blinking -> "+ _current_state.blinking);
+   // misty.Debug("_current_state.time_out -> "+ _current_state.time_out);
     if (_current_state.image != new_state.image) // necessary to prevent flashing due to repeated calls
     {
         misty.DisplayImage(new_state.image); // Change eyes
@@ -55,8 +72,8 @@ function _display_faces(data)
     //{
    // misty.Debug(JSON.stringify(data));
     misty.Debug("display_faces: External command received from Source -> " + data.Source + ", Event -> " + data.EventName);
+    misty.Debug("display_faces: guardian_data: " + data.guardian_data.image + " " + data.guardian_data.blinking);
     let received = data["guardian_data"];
-    misty.Debug(received);
 
     switch (data.Source)
     {
