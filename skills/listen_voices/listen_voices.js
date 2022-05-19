@@ -1,9 +1,9 @@
 ////////////////////////////////////////
 /*       Initialisation               */
 //////////////////////////////////////// 
-_current_state = "on";
-_audio_recording = false;
-_default_data = {"guardian_data": _current_state};
+misty.Set("_current_state","on");
+misty.Set("_audio_recording", false);
+misty.Set("_default_data", JSON.stringify({"guardian_data": _current_state}));
 
 //misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
 misty.RegisterUserEvent("listen_voices", true);
@@ -89,6 +89,9 @@ function afterAudioGet(data) {
 ////////////////////////////////////////
 // Callback function to execute when Misty hears the key phrase
 function _KeyPhraseRecognized() {
+    let _current_state = misty.Get("_current_state");
+    let _audio_recording = misty.Get("_audio_recording");
+    
     if (_current_state == "on" && !_audio_recording)
     {
         misty.Debug("Key phrase recognized!");
@@ -157,10 +160,12 @@ function GetAudioFile(data){
 function set_current_state(received, received_data)
 {
    // misty.Debug("> " + received + ", " + received_data);
+    let _current_state = misty.Get("_current_state");
+    let _audio_recording = misty.Get("_audio_recording");
     switch (received)
     {
         case "on":
-            misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
+            misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 100, false);
             misty.StartKeyPhraseRecognition();
             _current_state = "on";
             break;
@@ -182,9 +187,13 @@ function set_current_state(received, received_data)
                 record_audio(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
                 
                 misty.Pause(100);
+                if (old_state == "on")
+                {
+                    misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 100, false);
+                    misty.StartKeyPhraseRecognition();   
+                }
                 _current_state = old_state;
                 _audio_recording = false;
-                set_current_state(_current_state, received_data);
             }
             break;
         case "listen_answers":
@@ -201,11 +210,17 @@ function set_current_state(received, received_data)
                 listen_answers(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
                 
                 misty.Pause(100);
+                if (old_state == "on")
+                {
+                    misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 100, false);
+                    misty.StartKeyPhraseRecognition();   
+                }
                 _current_state = old_state;
                 _audio_recording = false;
-                set_current_state(_current_state, received_data);
             }
             break;
         case "default":    
     }
+    misty.Set("_current_state", _current_state);
+    misty.Set("_audio_recording", _audio_recording);
 }
