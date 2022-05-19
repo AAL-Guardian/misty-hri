@@ -16,20 +16,14 @@ function message(the_message, sensor_name)
 
 function startSkill()
 {
-  
-    RegisterGuardianEvent();
+    //misty.AddPropertyTest("guardian", "guardian_command", "==", "sense_touch", "string");
+    //misty.AddReturnProperty("guardian", "guardian_data");
+    misty.RegisterUserEvent("sense_touch", true);
     RegisterTouch();
 
 }
 
 // Respond to User events
-function RegisterGuardianEvent(data)
-{
-    //misty.AddPropertyTest("guardian", "guardian_command", "==", "sense_touch", "string");
-    //misty.AddReturnProperty("guardian", "guardian_data");
-    misty.RegisterUserEvent("sense_touch", true);
-}
-
 function _sense_touch(data)
 {
      //let command = data["guardian_command"];    
@@ -69,15 +63,15 @@ function RegisterTouch()
 
 function _Touched(data)
 {
-    var sensor = data.AdditionalResults[0];
-    var isPressed = data.AdditionalResults[1];
-    var time_stamp = data.AdditionalResults[2];
+    let sensor = data.AdditionalResults[0];
+    let isPressed = data.AdditionalResults[1];
+    let time_stamp = data.AdditionalResults[2];
     isPressed ? misty.Debug(sensor+" is Touched") : misty.Debug(sensor+" is Released");
     if (misty.Get("_touch_active"))
     {
         if (isPressed)
         {
-            _last_sensor = {"sensor":sensor, "is_pressed":true, "time_stamp":created};
+            _last_sensor = {"sensor":sensor, "is_pressed":true, "time_stamp":time_stamp};
             misty.Set("_last_sensor", JSON.stringify(_last_sensor));
 
             switch (sensor)
@@ -117,12 +111,13 @@ function _Touched(data)
             _last_sensor = JSON.parse(misty.Get("_last_sensor"));
             if (sensor == _last_sensor.sensor)
             {
-                current_time = created;
-                last_time = _last_sensor.time_stamp;
-                misty.Debug("last time -> "+last_time);
-                if (current_time-last_time > 3)
+                current_time = Date(time_stamp).valueOf();
+                last_time = Date(_last_sensor.time_stamp).valueOf();
+                misty.Debug("Duration -> "+ current_time - last_time);
+                if (current_time-last_time > 3000)
                 {
                     // goto sleep mode
+                    misty.TriggerEvent("display_faces", "sense_touch", JSON.stringify({"image":'e_Sleep.jpg', "blinking":false, "time_out":0}), "");
                     the_message = message("sleep_activated", sensor);
                     misty.TriggerEvent("eye_contact", "sense_touch", the_message , "");
                     misty.TriggerEvent("guardian", "sense_touch", the_message, "");                    
