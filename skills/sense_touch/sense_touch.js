@@ -80,7 +80,8 @@ function _Touched(data)
             {
                 case "Chin":
                     //misty.Speak("That tickles.");
-                    misty.PlayAudio("010-Uhm.wav");
+                    misty.PlayAudio("037-Eurrt.wav");
+                    misty.TriggerEvent("enjoy","sense_touch","","");
                     break;
                 case "HeadRight":
                     misty.PlayAudio("010-Uhm.wav");
