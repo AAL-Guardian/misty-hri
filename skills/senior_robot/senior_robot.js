@@ -22,6 +22,8 @@ function _yes(data) {
     misty.DisplayImage("e_Amazement.jpg");
     misty.Pause(3000);
     misty.DisplayImage("e_DefaultContent.jpg");
+    misty.SetBlinking(true); // turn blinking on/off
+
 
 } 
 
@@ -34,6 +36,7 @@ function _medication(data) {
     misty.DisplayImage("e_Amazement.jpg");
     misty.Pause(3000);
     misty.DisplayImage("e_DefaultContent.jpg");
+    misty.SetBlinking(true); // turn blinking on/off
 
 } 
 misty.RegisterUserEvent("yesmedication", true);
@@ -47,6 +50,7 @@ function _yesmedication(data) {
     misty.MoveHead(26, 0, 0, 100);
     misty.MoveHead(0, 0, 0, 100);
     misty.DisplayImage("e_Joy.jpg");
+    misty.SetBlinking(true); // turn blinking on/off
     misty.Pause(3000);
     misty.DisplayImage("e_DefaultContent.jpg");
 
@@ -56,6 +60,7 @@ misty.RegisterUserEvent("meal", true);
 function _meal(data) {
 
     misty.DisplayImage("e_EcstacyStarryEyed.jpg");
+    misty.SetBlinking(true); // turn blinking on/off
     misty.Pause(3000);
     misty.DisplayImage("e_DefaultContent.jpg");
     misty.MoveArmsDegrees(-90, -90, 100, 100);
@@ -67,7 +72,8 @@ misty.RegisterUserEvent("sleep", true);
 function _sleep(data) {
 
     
-    misty.DisplayImage("e_DefaultContent.jpg"); //e_Sleeping.jpg?
+    misty.DisplayImage("e_Sleeping.jpg");
+    misty.SetBlinking(false); // turn blinking on/off
     misty.MoveArmsDegrees(0, -90, 100, 100);
     misty.Pause(4000)
     misty.MoveArmsDegrees(-90, -90, 100, 100);
@@ -81,6 +87,7 @@ function _activitysuggestion(data) {
 
     
     misty.DisplayImage("e_DefaultContent.jpg");
+    misty.SetBlinking(true); // turn blinking on/off
 
     misty.MoveArmsDegrees(-90, -90, 100, 100);
     misty.Pause(4000)
@@ -102,10 +109,10 @@ function _wake_up(data)
     misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
 }
 
-misty.RegisterUserEvent("go_to_sleep",true);
+misty.RegisterUserEvent("go_to_standby",true);
 function _go_to_sleep(data)
 {
-    misty.DisplayImage("e_Sleep.jpg"); // Change eyes
+    misty.DisplayImage("e_Sleep2.jpg"); // Change eyes
     misty.SetBlinking(false); // turn blinking on/off
 }
 
