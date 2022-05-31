@@ -13,8 +13,9 @@ StartListening();
 
 function message(the_message)
 {
+    let _listen_voices = misty.Get("_listen_voices"); 
     return JSON.stringify({ "skill" : "listen_voices",
-                            "state" : _current_state,
+                            "state" : _listen_voices,
                             "message": the_message});
 }
 
