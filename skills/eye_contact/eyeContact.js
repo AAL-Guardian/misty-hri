@@ -18,9 +18,9 @@ function startSkill()
     initHeadPose();
 
     skill_state = "on";
-    default_data = {   "sleep" :{"time_out":300000},
-                        "normal":{"time_out":20000  , "look_around":5},
-                        "alert" :{"time_out":10000   , "look_around":5}
+    default_data = {   "sleep" :{"time_out":0}, //0 is never
+                        "normal":{"time_out":20000  , "look_around":2},
+                        "alert" :{"time_out":10000   , "look_around":3}
                     };
     eye_state = {   "image":"e_DefaultContent.jpg",
                     "blinking": true};
@@ -573,7 +573,7 @@ function stateMachine(new_state, new_data)
         //misty.Debug("time_out in _state_data and new_data: " + _state_data.time_out);
         misty.Debug("state -> " + new_state + ", time_out -> " + new_data.time_out + ", look_around -> " + new_data.look_around);
 //        misty.UnregisterEvent("timeOutLogic");
-        misty.RegisterTimerEvent("timeOutLogic", new_data.time_out, false);
+        if (new_data.time_out > 0) misty.RegisterTimerEvent("timeOutLogic", new_data.time_out, false);
     }
 }
 

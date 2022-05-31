@@ -1,27 +1,21 @@
 ////////////////////////////////////////
 /*       Initialisation               */
 //////////////////////////////////////// 
-misty.Set("_current_state","on");
-misty.Set("_audio_recording", false);
-misty.Set("_default_data", JSON.stringify({"guardian_data": _current_state}));
+misty.Set("_listen_voices", true);
+misty.Set("_listen_answers", false);
+misty.Set("_record_audio", false);
 
-//misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 10, false);
 misty.RegisterUserEvent("listen_voices", true);
-//misty.RegisterTimerEvent("time_out_logic", 30000, false);
-set_current_state(_current_state, _default_data);
-/* 
-function _time_out_logic(data)
-{
-    //misty.Debug(">> " + _current_state);
-    set_current_state(_current_state);
-    // make sure the skill does not die
-    misty.RegisterTimerEvent("time_out_logic", 30000, false);   
-} */
+misty.RegisterUserEvent("listen_answers",true);
+misty.RegisterUserEvent("record_audio",true);
+
+StartListening();
 
 function message(the_message)
 {
+    let _listen_voices = misty.Get("_listen_voices"); 
     return JSON.stringify({ "skill" : "listen_voices",
-                            "state" : _current_state,
+                            "state" : _listen_voices,
                             "message": the_message});
 }
 
@@ -34,19 +28,19 @@ function _listen_voices(data)
      //misty.Debug("> "+data.guardian_data);
      try{
         the_data = data.guardian_data;
+        misty.Debug("listen_voices: External command received -> " + the_data);
         
-        if ((the_data == "on") || (the_data == "off"))
+        if (the_data == "on")
         {
-            received = the_data; 
-        } else {
-            the_data = JSON.parse(the_data);
-            received = the_data.command;
+            StartListening();    
         }
-        misty.Debug("listen_voices: External command received -> " + received);
+        else if(the_data == "off")
+        {
+            StopListening();
+        }
 
         the_message = message("command received");
         misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud a message is received
-        set_current_state(received, data.guardian_data);
     } catch (e)
     {
         misty.Debug(e);
@@ -55,27 +49,60 @@ function _listen_voices(data)
 
 }
 
+function StartListening()
+{
+        misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 20, false);
+        misty.StartKeyPhraseRecognition();
+        misty.Set("_listen_voices", true);
+}
+
+function StopListening()
+{
+        misty.StopKeyPhraseRecognition();
+        misty.UnregisterEvent("KeyPhraseRecognition");
+        misty.Set("_listen_voices", false);
+        misty.Pause(100);
+}
+
 ////////////////////////////////////////
 /*       Record audio                 */
 //////////////////////////////////////// 
-function record_audio(guardian_data) {
+function _record_audio(guardian_data) {
+    let _record_audio = misty.Get("_record_audio");
+    let _listen_answers = misty.Get("_listen_answers");
+    let _listen_voices = misty.Get("_listen_voices");
 
-     // INPUT PARAMETERS
-    data = JSON.parse(guardian_data);
-    const uploadUrl = data.upload_url;
-    const time = data.time || 10;
-    // LOCAL VARIABLES
-    misty.Set("currentUploadUrl", uploadUrl, false);
-    const filename = "test_raw_audio_file.wav";
-    misty.Debug("Start Recording Audio");
-    misty.SendExternalRequest("POST", "http://localhost/api/audio/raw/record/start", null, null, JSON.stringify({ filename }), true, false, null, null);
-    //the pause command allow to determine the duration of the recorded audio signal. Modify the time to determine the duration 
-    misty.Pause(time * 1000);
-    misty.Debug("audio registrato!!");
-    misty.StopRecordingAudio();
-    misty.Debug("stop recording audio");
+    if (!_listen_answers && !_record_audio)
+    {
+        misty.Set("_record_audio", true);      
+        if (_listen_voices == true)
+        {
+            StopListening();
+        }
 
-    misty.SendExternalRequest("GET", "http://localhost/api/audio?FileName=" + filename + "&Base64=false", null, null, null, false, false, null, null, 'afterAudioGet');
+        // INPUT PARAMETERS
+        data = JSON.parse(guardian_data);
+        const uploadUrl = data.upload_url;
+        const time = data.time || 10;
+        // LOCAL VARIABLES
+        misty.Set("currentUploadUrl", uploadUrl, false);
+        const filename = "test_raw_audio_file.wav";
+        misty.Debug("Start Recording Audio");
+        misty.SendExternalRequest("POST", "http://localhost/api/audio/raw/record/start", null, null, JSON.stringify({ filename }), true, false, null, null);
+        //the pause command allow to determine the duration of the recorded audio signal. Modify the time to determine the duration 
+        misty.Pause(time * 1000);
+        misty.Debug("audio registrato!!");
+        misty.StopRecordingAudio();
+        misty.Debug("stop recording audio");
+
+        misty.SendExternalRequest("GET", "http://localhost/api/audio?FileName=" + filename + "&Base64=false", null, null, null, false, false, null, null, 'afterAudioGet');
+
+        if (_listen_voices == true)
+        {
+            StartListening();
+        }
+        misty.Set("_record_audio", false);
+    }
 }
 
 function afterAudioGet(data) {
@@ -88,18 +115,25 @@ function afterAudioGet(data) {
 /*          Keyphrase detection       */
 ////////////////////////////////////////
 // Callback function to execute when Misty hears the key phrase
-function _KeyPhraseRecognized() {
-    let _current_state = misty.Get("_current_state");
-    let _audio_recording = misty.Get("_audio_recording");
-    
-    if (_current_state == "on" && !_audio_recording)
+function _KeyPhraseRecognized()
+{
+    let _record_audio = misty.Get("_record_audio");
+    let _listen_answers = misty.Get("_listen_answers");
+    let _listen_voices = misty.Get("_listen_voices");
+
+   if (_listen_voices)
     {
-        misty.Debug("Key phrase recognized!");
-        the_message = message("key_phrase_detected");
-        misty.TriggerEvent("eye_contact", "listen_voices", the_message, "");
-        misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud what is received
-        waveRightArm();
-        set_current_state(_current_state, ""); //registers key event again
+        if (!_listen_answers && !_record_audio)
+        {        
+            misty.Debug("Key phrase recognized!");
+            the_message = message("key_phrase_detected");
+            misty.TriggerEvent("eye_contact", "listen_voices", the_message, "");
+            misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud what is received
+            //misty.TriggerEvent("hey_misty","listen_voices", the_message,""); 
+            waveRightArm();
+        }
+        StartListening(); //listen for next key phrase
+
     }
 }
 
@@ -117,30 +151,49 @@ function waveRightArm() {
 ////////////////////////////////////////
 /*               Listen Answers       */
 ////////////////////////////////////////
+function _listen_answers(data) {
+    let _record_audio = misty.Get("_record_audio");
+    let _listen_answers = misty.Get("_listen_answers");
+    let _listen_voices = misty.Get("_listen_voices");
 
-function listen_answers(guardian_data) {
+    if (!_record_audio && !_listen_answers)
+    {
+        misty.Set("_listen_answers", true);
+        if (_listen_voices == true)
+        {
+            StopListening()
+        }
 
-    //CONSTATS:
-    const filename = 'answerAudio.wav';
+        
+            //CONSTANTS:
+        const filename = 'answerAudio.wav';
 
-    // INPUT PARAMETERS
-    const data = JSON.parse(guardian_data);
-    const uploadUrl = data.upload_url;
-    const time = data.time || 5;
-    misty.Debug(">> "+ time + ", " + uploadUrl)
-    // LOCAL VARIABLES
-    misty.Set("currentUploadUrl", uploadUrl, false);
-    
-    // START WORK
-    misty.Debug("Start Recording Audio Answer");
-    misty.StartRecordingAudio(filename)
-    misty.Pause(time * 1000);
-    misty.StopRecordingAudio();
-    misty.Debug("audio registrato!!");
-    misty.GetAudioFile(filename);
+        // INPUT PARAMETERS
+        const command_data = JSON.parse(data.guardian_data);
+        const uploadUrl = command_data.upload_url;
+        const time = command_data.time || 0;
+
+        // LOCAL VARIABLES
+        misty.Set("currentUploadUrl", uploadUrl, false);
+
+        // START WORK
+        misty.Debug("Start Recording Audio Answer");
+        misty.StartRecordingAudio(filename, 0, time * 1000)
+        // misty.Pause(time * 1000);
+        misty.StopRecordingAudio();
+        misty.Debug("audio registrato!!");
+        misty.GetAudioFile(filename);
+
+ 
+        if (_listen_voices == true)
+        {
+            StartListening();
+        }
+        misty.Set("_listen_answers", false)
+    }
 }
 
-function GetAudioFile(data){
+function _GetAudioFile(data) {
     // SEND FILE
     misty.Debug("Invio Audio");
     const uploadUrl = misty.Get("currentUploadUrl");
@@ -148,79 +201,8 @@ function GetAudioFile(data){
         misty.Debug(uploadUrl);
         misty.SendExternalRequest("PUT", uploadUrl, null, null, data.Result.Base64);
         misty.Debug("Audio Inviato");
-        } catch (e) {
+    } catch (e) {
         misty.Debug(e)
     }
-    
-}
 
-////////////////////////////////////////
-/*          State machine             */
-////////////////////////////////////////
-function set_current_state(received, received_data)
-{
-   // misty.Debug("> " + received + ", " + received_data);
-    let _current_state = misty.Get("_current_state");
-    let _audio_recording = misty.Get("_audio_recording");
-    switch (received)
-    {
-        case "on":
-            misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 100, false);
-            misty.StartKeyPhraseRecognition();
-            _current_state = "on";
-            break;
-        case "off":
-            misty.StopKeyPhraseRecognition();
-            misty.UnregisterEvent("KeyPhraseRecognition");
-            _current_state = "off";
-            break;
-        case "record_audio":
-            if (!_audio_recording)
-            {
-                old_state = _current_state;
-                misty.StopKeyPhraseRecognition();
-                misty.UnregisterEvent("KeyPhraseRecognition");
-                misty.Pause(100);
-                _current_state = "record_audio";
-                _audio_recording = true;
-
-                record_audio(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
-                
-                misty.Pause(100);
-                if (old_state == "on")
-                {
-                    misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 100, false);
-                    misty.StartKeyPhraseRecognition();   
-                }
-                _current_state = old_state;
-                _audio_recording = false;
-            }
-            break;
-        case "listen_answers":
-            //misty.Debug("> "+ _audio_recording+ ", "+ _current_state +", "+ received + ", "+ JSON.stringify(received_data));
-            if (!_audio_recording)
-            {
-                old_state = _current_state;
-                misty.StopKeyPhraseRecognition();
-                misty.UnregisterEvent("KeyPhraseRecognition");
-                misty.Pause(100);
-                _current_state = "listen_answers";
-                _audio_recording = true;
-
-                listen_answers(received_data); // blocking call, so it shouldn't be possible to get multiple recordings at the same time?
-                
-                misty.Pause(100);
-                if (old_state == "on")
-                {
-                    misty.RegisterEvent("KeyPhraseRecognized","KeyPhraseRecognized", 100, false);
-                    misty.StartKeyPhraseRecognition();   
-                }
-                _current_state = old_state;
-                _audio_recording = false;
-            }
-            break;
-        case "default":    
-    }
-    misty.Set("_current_state", _current_state);
-    misty.Set("_audio_recording", _audio_recording);
 }

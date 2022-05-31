@@ -51,6 +51,7 @@ function _emotion_yesmedication(data) {
     misty.MoveHead(26, 0, 0, 100);
     misty.MoveHead(0, 0, 0, 100);
     misty.DisplayImage("e_Joy.jpg");
+    misty.SetBlinking(true); // turn blinking on/off
     misty.Pause(3000);
     misty.DisplayImage("e_DefaultContent.jpg");
     misty.SetBlinking(true); // turn blinking on/off
@@ -61,6 +62,7 @@ misty.RegisterUserEvent("emotion_meal", true);
 function _emotion_meal(data) {
 
     misty.DisplayImage("e_EcstacyStarryEyed.jpg");
+    misty.SetBlinking(true); // turn blinking on/off
     misty.Pause(3000);
     misty.DisplayImage("e_DefaultContent.jpg");
     misty.SetBlinking(true); // turn blinking on/off
