@@ -182,7 +182,7 @@ function _behavior_go_to_standby(data)
 misty.RegisterUserEvent("emotion_enjoy",true);
 function _emotion_enjoy(data)
 {
-    misty.DisplayImage("e_Pride.jpg"); // Change eyes
+    misty.DisplayImage("e_Admiration.jpg"); // Change eyes
     misty.Pause(5000);
     misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
     misty.SetBlinking(true); // turn blinking on/off
