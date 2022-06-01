@@ -173,7 +173,7 @@ function _behavior_wake_up(data)
 }
 
 misty.RegisterUserEvent("behavior_go_to_standby",true);
-function _behavior_go_to_sleep(data)
+function _behavior_go_to_standby(data)
 {
     misty.DisplayImage("e_Sleep2.jpg"); // Change eyes
     misty.SetBlinking(false); // turn blinking on/off
@@ -182,7 +182,7 @@ function _behavior_go_to_sleep(data)
 misty.RegisterUserEvent("emotion_enjoy",true);
 function _emotion_enjoy(data)
 {
-    misty.DisplayImage("e_Pride.jpg"); // Change eyes
+    misty.DisplayImage("e_Admiration.jpg"); // Change eyes
     misty.Pause(5000);
     misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
     misty.SetBlinking(true); // turn blinking on/off
