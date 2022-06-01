@@ -27,7 +27,7 @@ function _listen_voices(data)
      //let command = data["guardian_command"];    
      //misty.Debug("> "+data.guardian_data);
      try{
-        the_data = data.guardian_data;
+        const the_data = data.guardian_data;
         misty.Debug("listen_voices: External command received -> " + the_data);
         
         if (the_data == "on")
@@ -39,7 +39,7 @@ function _listen_voices(data)
             StopListening();
         }
 
-        the_message = message("command received");
+        const the_message = message("command received");
         misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud a message is received
     } catch (e)
     {
@@ -81,7 +81,7 @@ function _record_audio(guardian_data) {
         }
 
         // INPUT PARAMETERS
-        data = JSON.parse(guardian_data);
+        const data = JSON.parse(guardian_data);
         const uploadUrl = data.upload_url;
         const time = data.time || 10;
         // LOCAL VARIABLES
