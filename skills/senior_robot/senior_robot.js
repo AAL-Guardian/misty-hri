@@ -173,7 +173,7 @@ function _behavior_wake_up(data)
 }
 
 misty.RegisterUserEvent("behavior_go_to_standby",true);
-function _behavior_go_to_sleep(data)
+function _behavior_go_to_standby(data)
 {
     misty.DisplayImage("e_Sleep2.jpg"); // Change eyes
     misty.SetBlinking(false); // turn blinking on/off
