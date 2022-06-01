@@ -183,7 +183,7 @@ misty.RegisterUserEvent("emotion_enjoy",true);
 function _emotion_enjoy(data)
 {
     misty.DisplayImage("e_Admiration.jpg"); // Change eyes
-    misty.Pause(5000);
+    misty.Pause(3000);
     misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
     misty.SetBlinking(true); // turn blinking on/off
 }
