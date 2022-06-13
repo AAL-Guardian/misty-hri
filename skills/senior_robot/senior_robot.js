@@ -163,6 +163,8 @@ function _behavior_wake_up(data)
     misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
     misty.SetBlinking(true); // turn blinking on/off
 
+    misty.MoveHead(0, 0, 0, 100);
+    
     misty.MoveArmDegrees("left", 90, 45); // Left arm fully down
     misty.Pause(50);
     misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
@@ -172,10 +174,38 @@ function _behavior_wake_up(data)
     misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
 }
 
+misty.RegisterUserEvent("behavior_go_to_alert",true);
+function _behavior_go_to_alert(data)
+{
+    misty.ChangeLED(0, 255, 0); // Changes LED to off
+    misty.DisplayImage("e_Joy.jpg"); // Change eyes
+    misty.SetBlinking(true); // turn blinking on/off
+}
+
+misty.RegisterUserEvent("behavior_go_to_normal",true);
+function _behavior_go_to_normal(data)
+{
+    misty.ChangeLED(255, 255, 255); // Changes LED to off
+    misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
+    //misty.MoveHead(0, 0, 0, 80);
+    misty.SetBlinking(true); // turn blinking on/off
+}
+
 misty.RegisterUserEvent("behavior_go_to_standby",true);
 function _behavior_go_to_standby(data)
 {
-    misty.DisplayImage("e_Sleep2.jpg"); // Change eyes
+    misty.ChangeLED(0, 0, 0); // Changes LED to off
+    misty.DisplayImage("e_Sleepy2.jpg"); // Change eyes
+    //misty.MoveHead(0, 0, 0, 50);
+    misty.SetBlinking(false); // turn blinking on/off
+}
+
+misty.RegisterUserEvent("behavior_go_to_sleep",true);
+function _behavior_go_to_sleep(data)
+{
+    misty.ChangeLED(0, 0, 0); // Changes LED to off
+    misty.DisplayImage("e_Sleepy.jpg"); // Change eyes
+    misty.MoveHead(0, 0, 0, 50);
     misty.SetBlinking(false); // turn blinking on/off
 }
 
@@ -184,6 +214,17 @@ function _emotion_enjoy(data)
 {
     misty.DisplayImage("e_Admiration.jpg"); // Change eyes
     misty.Pause(3000);
+    misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
+    misty.SetBlinking(true); // turn blinking on/off
+}
+
+misty.RegisterUserEvent("emotion_surprised",true);
+function _emotion_surprised(data)
+{
+    misty.ChangeLED(148, 0, 211); // Changes LED to purple
+    misty.DisplayImage("e_Surprise.jpg"); // Change eyes
+    misty.Pause(3000);
+    misty.ChangeLED(255, 255, 255); // Changes LED to off
     misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
     misty.SetBlinking(true); // turn blinking on/off
 }

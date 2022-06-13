@@ -8,7 +8,7 @@ Created on Mon Feb 22 12:16:49 2021
 import requests
 import json
 
-robot_ip = '192.168.178.66'
+robot_ip = '192.168.0.101'
 source = "MyRobotApplication"
 #skill_id = "5d3e55e9-c878-4fbc-8d62-172fbdd9c48c"
 #event_name = "eye_contact"
@@ -16,8 +16,12 @@ source = "MyRobotApplication"
 #skill_id = "0723e9a7-8e10-4931-b2a1-9a36b895a04c"
 #event_name = "sense_touch"
 
-skill_id = "6ca82a95-01f2-4a85-b6e0-fc3480fef6cb"
-event_name = "listen_voices"
+#skill_id = "6ca82a95-01f2-4a85-b6e0-fc3480fef6cb"
+#event_name = "listen_voices"
+
+skill_id = "fe6336e8-43bf-4afb-aca7-6bccd6f0338a"
+event_name = "emotion_enjoy" #"behavior_go_to_standby" #"behavior_wake_up" #"emotion_sadness"
+
 
 def send_command(the_command, the_event_name = event_name, the_source = source):
     resp = requests.post('http://'+robot_ip+'/api/skills/event',json={
@@ -30,10 +34,11 @@ def send_command(the_command, the_event_name = event_name, the_source = source):
 
 done=False
 while not done:
+    ev=raw_input("Give event name: ")
     s=raw_input("Give a command or type quit: ")
     if s=="quit":
         done=True
     else:
-        resp = send_command(s)
+        resp = send_command(s, the_event_name = ev)
         print(resp.json())
 
