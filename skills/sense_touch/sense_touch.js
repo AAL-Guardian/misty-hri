@@ -63,7 +63,7 @@ function RegisterTouch()
     misty.Debug("Registering Touch");
     misty.AddReturnProperty("Touched", "SensorPosition");
     misty.AddReturnProperty("Touched", "IsContacted");
-    misty.RegisterEvent("Touched", "TouchSensor", 50 ,true);
+    misty.RegisterEvent("Touched", "TouchSensor", 50 ,false);
 }
 
 function _Touched(data)
@@ -107,5 +107,6 @@ function _Touched(data)
         misty.TriggerEvent("eye_contact", "sense_touch", the_message , "");
         misty.TriggerEvent("guardian", "sense_touch", the_message, "");
         }
-    }    
+    }
+    RegisterTouch();    
 } 
