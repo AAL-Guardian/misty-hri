@@ -4,6 +4,8 @@ Skills for misty's HRI functionality
 # Description
 The main that is developed is skills/eye_contact/eyecontact.js; The demo_raise_event skill serves as a demo for triggering Misty's eye_contact behaviour using an external event.
 
+
+
 The eye_contact skill took plenty of inspiration from the misty-community:
 https://github.com/MistySampleSkills/mistySeesYou
 https://github.com/MistySampleSkills/LooksAtFace
