@@ -69,77 +69,119 @@ function _Touched(data)
     let time_stamp = data.AdditionalResults[2];
     isPressed ? misty.Debug(sensor+" is Touched") : misty.Debug(sensor+" is Released");
 
-    if (misty.Get("_touch_active"))
-    {
-        if (isPressed)
-        {
-            misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":true, "time_stamp":time_stamp}));
 
-            switch (sensor)
-            {
-                case "Chin":
-                    //misty.Speak("That tickles.");
+    if (isPressed)
+    {
+        misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":true, "time_stamp":time_stamp}));
+
+        switch (sensor)
+        {
+            case "Chin":
+                if (misty.Get("_touch_active"))
+                {//misty.Speak("That tickles.");
                     misty.PlayAudio("037-Eurrt.wav");
- //                   the_message = JSON.stringify({"image":"e_Pride.jpg","blinking":true, "time_out":5});
- //                   misty.TriggerEvent("display_faces", "sense_touch", the_message, "");
- //                   misty.TriggerEvent("emotion_enjoy","sense_touch","","");
+//                   the_message = JSON.stringify({"image":"e_Pride.jpg","blinking":true, "time_out":5});
+//                   misty.TriggerEvent("display_faces", "sense_touch", the_message, "");
+//                   misty.TriggerEvent("emotion_enjoy","sense_touch","","");
                     misty.DisplayImage("e_Admiration.jpg"); // Change eyes
                     misty.Pause(3000);
                     misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
-                    break;
-                case "HeadRight":
-                    misty.PlayAudio("010-Uhm.wav");
-                    break;
-                case "HeadLeft":
-                    misty.PlayAudio("010-Uhm.wav");
-                    break;
-                case "HeadFront":
-                    misty.PlayAudio("010-Uhm.wav");
-                    break;
-                case "HeadBack":
-                    misty.PlayAudio("010-Uhm.wav");
-                    break;
-                case "Scruff":
-                    misty.PlayAudio("010-Uhm.wav");
-                    break;
-                default:
-                    misty.Debug("Sensor Name '" + sensor + "' is unknown.");
-            }
-    
-        //misty.Pause(100);
-        misty.TriggerEvent("behavior_go_to_normal", "sense_touch", "", "");
-        the_message = message("touch detected", sensor);
-        misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"message":"wake_up"}), "");
-        //misty.TriggerEvent("guardian", "sense_touch", the_message, "");
-        }
-        else
-        {
-            var _last_sensor = misty.Get("_last_sensor");
-            if (_last_sensor != "")
-            {
-                var _last_sensor = JSON.parse(_last_sensor);
-                if (sensor == _last_sensor.sensor)
-                {
-                    //misty.Debug("--> "+_last_sensor.sensor+" , "+_last_sensor.time_stamp);
-                    var t_last_time = Date.parse(_last_sensor.time_stamp) //.valueOf();
-                    //misty.Debug("--->> " + t_last_time);
-                    var t_current_time = Date.parse(time_stamp) //.valueOf();
-                    //misty.Debug("--->> " + t_current_time);
-                    var delta_t =  t_current_time - t_last_time;
-                    //misty.Debug("--->> " + delta_t);
-                    if (delta_t > 3000)
-                    {
-                        // goto sleep mode
-                        //misty.TriggerEvent("display_faces", "sense_touch", JSON.stringify({"image":'e_Sleep.jpg', "blinking":false, "time_out":0}), "");
-                        misty.TriggerEvent("behavior_go_to_sleep", "sense_touch", "", "");
-                        the_message = message("standby_activated", sensor);
-                        misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"message":"go_to_sleep"}) , "");
-                        misty.TriggerEvent("guardian", "sense_touch", the_message, "");                    
-                    }
                 }
-                misty.Set("_last_sensor",""); // reset time tracking of sensor pressed
+                break;
+            case "HeadRight":
+            case "HeadLeft":
+            case "HeadFront":
+            case "HeadBack":
+                if (misty.Get("_touch_active"))
+                {
+                    misty.PlayAudio("010-Uhm.wav");
+                }
+                break;
+            case "Scruff":
+                if (misty.Get("_touch_active"))
+                {
+                    misty.PlayAudio("005-Eurra.wav"); //007-Eurhura.wav
+                }
+                break;
+            default:
+                misty.Debug("Sensor Name '" + sensor + "' is unknown.");
+        }
+
+    DoTriggerEvents("touch_detected");
+    }
+    else
+    {
+        delta_t = DetectLongPress(sensor, time_stamp);
+        if (delta_t > 3000)
+        {
+            switch (sensor)
+            {
+                case "Scruff":
+                    misty.Set("_touch_active", false);
+                    misty.PlayAudio("010-Hummmmmm.wav");
+                    DoTriggerEvents("go_to_sleep", sensor);
+                    break;
+                case "Chin":
+                    misty.Set("_touch_active", true);
+                    misty.PlayAudio("001-OooOooo.wav");
+                    DoTriggerEvents("wake_up", sensor);
+                    break;
             }
         }
     }
+    
     RegisterTouch();    
-} 
+}
+
+function DetectLongPress(sensor, time_stamp)
+{
+    var _last_sensor = misty.Get("_last_sensor");
+    var delta_t = 0;
+
+    if (_last_sensor != "")
+    {
+        var _last_sensor = JSON.parse(_last_sensor);
+        if (sensor == _last_sensor.sensor)
+        {
+            //misty.Debug("--> "+_last_sensor.sensor+" , "+_last_sensor.time_stamp);
+            let t_last_time = Date.parse(_last_sensor.time_stamp) //.valueOf();
+            //misty.Debug("--->> " + t_last_time);
+            let t_current_time = Date.parse(time_stamp) //.valueOf();
+            //misty.Debug("--->> " + t_current_time);
+            delta_t =  t_current_time - t_last_time;
+            misty.Debug("--->> " + delta_t);
+        }
+        misty.Set("_last_sensor",""); // reset time tracking of sensor pressed
+    }
+    
+    return delta_t;
+}
+
+function DoTriggerEvents(behavior, sensor)
+{
+    switch (behavior)
+    {
+        case "go_to_sleep":
+   
+            // goto sleep mode
+            //misty.TriggerEvent("display_faces", "sense_touch", JSON.stringify({"image":'e_Sleep.jpg', "blinking":false, "time_out":0}), "");
+            //misty.TriggerEvent("behavior_go_to_sleep", "sense_touch", "", "");
+            misty.TriggerEvent("emotion_dormi", "sense_touch", "", "");
+            var msg = "off";
+            misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
+            break;
+        case "wake_up":
+            misty.TriggerEvent("behavior_wake_up", "sense_touch", "", "");
+            var msg = "on";
+            misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
+            break;
+        case "touch_detected":
+            var msg = "on";
+            break;
+        default:
+                   
+    }
+    the_message = message(behavior, sensor);
+    misty.TriggerEvent("guardian", "sense_touch", the_message, "");
+            
+}

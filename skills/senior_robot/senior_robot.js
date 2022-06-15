@@ -163,15 +163,15 @@ function _behavior_wake_up(data)
     misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
     misty.SetBlinking(true); // turn blinking on/off
 
-    misty.MoveHead(0, 0, 0, 100);
-    
+    misty.MoveHead(0, 0, 0, 80);
+/*     
     misty.MoveArmDegrees("left", 90, 45); // Left arm fully down
     misty.Pause(50);
     misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
     misty.Pause(50); // Pause for 3 seconds
     misty.MoveArmDegrees("right", -45, 45); // Right arm fully up
     misty.Pause(1000); // Pause with arm up for 5 seconds (wave!)
-    misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
+    misty.MoveArmDegrees("right", 90, 45); // Right arm fully down */
 }
 
 misty.RegisterUserEvent("behavior_go_to_alert",true);
