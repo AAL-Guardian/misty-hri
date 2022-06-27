@@ -169,11 +169,13 @@ function DoTriggerEvents(behavior, sensor)
             misty.TriggerEvent("emotion_dormi", "sense_touch", "", "");
             var msg = "off";
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
+            misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
             break;
         case "wake_up":
             misty.TriggerEvent("behavior_wake_up", "sense_touch", "", "");
             var msg = "on";
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
+            misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
             break;
         case "touch_detected":
             var msg = "touch_detected";

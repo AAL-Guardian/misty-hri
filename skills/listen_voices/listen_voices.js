@@ -13,9 +13,14 @@ StartListening();
 
 function message(the_message)
 {
-    let _listen_voices = misty.Get("_listen_voices"); 
+    let _listen_voices = misty.Get("_listen_voices");
+    if (_listen_voices) {
+        var state = "on";
+    } else {
+        var state = "off";
+    } 
     return JSON.stringify({ "skill" : "listen_voices",
-                            "state" : _listen_voices,
+                            "state" : state,
                             "message": the_message});
 }
 
@@ -59,7 +64,7 @@ function StartListening()
 function StopListening()
 {
         misty.StopKeyPhraseRecognition();
-        misty.UnregisterEvent("KeyPhraseRecognition");
+        misty.UnregisterEvent("KeyPhraseRecognized");
         misty.Set("_listen_voices", false);
         misty.Pause(100);
 }
