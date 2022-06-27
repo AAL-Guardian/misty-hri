@@ -127,10 +127,11 @@ function _KeyPhraseRecognized()
         {        
             misty.Debug("Key phrase recognized!");
             the_message = message("key_phrase_detected");
-            misty.TriggerEvent("eye_contact", "listen_voices", the_message, "");
             misty.TriggerEvent("guardian", "listen_voices", the_message, ""); // reply to cloud what is received
             //misty.TriggerEvent("hey_misty","listen_voices", the_message,""); 
             waveRightArm();
+            misty.TriggerEvent("eye_contact", "listen_voices", JSON.stringify({"guardian_data":"on"}), "");
+            
         }
         StartListening(); //listen for next key phrase
 

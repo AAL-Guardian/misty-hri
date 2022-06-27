@@ -176,7 +176,8 @@ function DoTriggerEvents(behavior, sensor)
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
             break;
         case "touch_detected":
-            var msg = "on";
+            var msg = "touch_detected";
+            misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
             break;
         default:
                    
