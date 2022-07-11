@@ -47,7 +47,7 @@ function startSkill()
 function message(the_message)
 {
     return JSON.stringify({ "skill" : "eye_contact",
-                            "state" : misty.Get("_skill_state"),
+                            "state" : misty.Get("_current_state"),
                             "message": the_message});
 }
 
@@ -522,7 +522,7 @@ function stateMachine(new_state, new_data)
             case "off":
                 misty.StopFaceDetection();
                 misty.UnregisterEvent("timeOutLogic");
-                misty.Set("_skill_state", "off");
+                //misty.Set("_skill_state", "off");
                 break;           
             case "standby":
                 // Stop face recognition
