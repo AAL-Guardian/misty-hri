@@ -4,7 +4,7 @@ name: "auto-release"
 on:
   push:
     branches:
-      - prototype2
+      - prototype3
 
 jobs:
   prepare-artifacts:
@@ -13,12 +13,14 @@ jobs:
         matrix:
           skill: 
             - change_led
+            # - display_faces
             - eye_contact
             - head_position_reporter
-            - listen_answers
-            # - listen_voices
-            - old_listen_voices
+            # - listen_answers
+            - listen_voices
+            # - old_listen_voices
             # - speak_to_user
+            - senior_robot
             - sense_touch
             - speak_from_url
             - take_photo_to_position
@@ -49,6 +51,6 @@ jobs:
           path: skills-files/
       - uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.date.outputs.date }}
+          tag: v3-${{ steps.date.outputs.date }}
           artifacts: "skills-files/*.zip/*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}

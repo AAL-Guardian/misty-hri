@@ -8,7 +8,7 @@ Created on Mon Feb 22 12:16:49 2021
 import requests
 import json
 
-robot_ip = '192.168.178.66'
+robot_ip = '192.168.0.101'
 source = "MyRobotApplication"
 #skill_id = "5d3e55e9-c878-4fbc-8d62-172fbdd9c48c"
 #event_name = "eye_contact"
@@ -20,8 +20,12 @@ source = "MyRobotApplication"
 #event_name = "listen_voices"
 
 
-skill_id = "f711c84c-78f4-4d49-ac3c-ee3f9c7a7b66"
-the_event_name = "display_faces"
+#skill_id = "f711c84c-78f4-4d49-ac3c-ee3f9c7a7b66"
+#event_name = "display_faces"
+
+skill_id = "fe6336e8-43bf-4afb-aca7-6bccd6f0338a"
+event_name = "emotion_enjoy" #"behavior_go_to_standby" #"behavior_wake_up" #"emotion_sadness"
+
 
 def send_command(the_command, the_event_name = event_name, the_source = source):
     resp = requests.post('http://'+robot_ip+'/api/skills/event',json={
@@ -35,10 +39,11 @@ def send_command(the_command, the_event_name = event_name, the_source = source):
 
 done=False
 while not done:
-    #s=raw_input("Give a command or type quit: ") # python 2.7
-    s=input("Give a command or type quit: ") # python 3.x
+    ev=raw_input("Give event name: ")
+    s=raw_input("Give a command or type quit: ")
     if s=="quit":
         done=True
     else:
-        resp = send_command(s)
+        resp = send_command(s, the_event_name = ev)
         print(resp.json())
+
