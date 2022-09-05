@@ -4,6 +4,7 @@ misty.Debug("Sense_touch skill has started.");
 
 misty.Set("_touch_active", true);
 misty.Set("_last_sensor","");
+misty.Set("_waiting_for_timeout", false);
 
 startSkill();
 
@@ -73,6 +74,7 @@ function _Touched(data)
     if (isPressed)
     {
         misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":true, "time_stamp":time_stamp}));
+        misty.Get("_waiting_for_timeout")? DoStopTimer() : DoStartTimer();
 
         switch (sensor)
         {
@@ -107,27 +109,33 @@ function _Touched(data)
                 misty.Debug("Sensor Name '" + sensor + "' is unknown.");
         }
 
-    DoTriggerEvents("touch_detected");
+        DoTriggerEvents("touch_detected");
     }
     else
     {
+        misty.Set("_waiting_for_timeout", false); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
         delta_t = DetectLongPress(sensor, time_stamp);
         if (delta_t > 3000)
         {
+            misty.Debug("-> Long press detected");
             switch (sensor)
             {
                 case "Scruff":
-                    misty.Set("_touch_active", false);
-                    misty.PlayAudio("020-Whoap.wav");
-                    DoTriggerEvents("go_to_sleep", sensor);
-                    break;
+  //                  misty.Set("_touch_active", false);
+  //                  misty.PlayAudio("020-Whoap.wav");
+ //                   DoTriggerEvents("go_to_sleep", sensor);
+ //                   break;
+                case "HeadRight":
+                case "HeadLeft":
+                case "HeadFront":
+                case "HeadBack":
                 case "Chin":
-                    misty.Set("_touch_active", true);
-                    misty.PlayAudio("001-OooOooo.wav");
-                    DoTriggerEvents("wake_up", sensor);
+                    DoToggleSleepMode();
                     break;
             }
         }
+        misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":false, "time_stamp":time_stamp}));
+
     }
     
     RegisterTouch();    
@@ -189,4 +197,60 @@ function DoTriggerEvents(behavior, sensor)
     the_message = message(behavior, sensor);
     misty.TriggerEvent("guardian", "sense_touch", the_message, "");
             
+}
+
+function DoToggleSleepMode()
+{
+    if (misty.Get("_touch_active"))
+    {
+        // go_to_sleep
+        misty.Set("_touch_active", false);
+        misty.PlayAudio("020-Whoap.wav");
+        DoTriggerEvents("go_to_sleep", sensor);
+    }
+    else { // wake up
+        misty.Set("_touch_active", true);
+        misty.PlayAudio("001-OooOooo.wav");
+        DoTriggerEvents("wake_up", sensor);
+    }
+}
+
+function DoStartTimer()
+{
+    time_out=3000;
+    misty.RegisterTimerEvent("timeOutLongPress", time_out, false);
+    misty.Set("_waiting_for_timeout", true);
+}
+
+function DoStopTimer()
+{
+    misty.UnregisterEvent("timeOutLongPress");
+    misty.Set("_waiting_for_timeout", false);
+}
+
+function _timeOutLongPress(data)
+{
+    if (misty.Get("_waiting_for_timeout"))
+    {
+        var last_sensor = misty.Get("_last_sensor");
+    
+        if (last_sensor != "")
+        {
+            var last_sensor = JSON.parse(_last_sensor);
+            switch (last_sensor.sensor)
+            {
+                case "Scruff":
+                //case "HeadRight":
+                //case "HeadLeft":
+                //case "HeadFront":
+                //case "HeadBack":
+                case "Chin":
+                    DoToggleSleepMode();
+                    break;
+            }
+        }
+    }
+    else {
+        // time out interrupted by newer touch event, do nothing
+    }
 }
