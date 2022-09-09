@@ -81,7 +81,7 @@ function _Touched(data)
             case "Chin":
                 if (misty.Get("_touch_active"))
                 {//misty.Speak("That tickles.");
-                    misty.PlayAudio("030-Beewe.wav");
+                    misty.PlayAudio("037-Eurrt.wav");
 //                   the_message = JSON.stringify({"image":"e_Pride.jpg","blinking":true, "time_out":5});
 //                   misty.TriggerEvent("display_faces", "sense_touch", the_message, "");
 //                   misty.TriggerEvent("emotion_enjoy","sense_touch","","");
@@ -102,7 +102,7 @@ function _Touched(data)
             case "Scruff":
                 if (misty.Get("_touch_active"))
                 {
-                    misty.PlayAudio("020-Whoap.wav"); //007-Eurhura.wav
+                    misty.PlayAudio("010-Hummmmmm.wav"); //007-Eurhura.wav
                 }
                 break;
             default:
