@@ -205,7 +205,7 @@ function DoToggleSleepMode()
     {
         // go_to_sleep
         misty.Set("_touch_active", false);
-        misty.PlayAudio("020-Whoap.wav");
+        misty.PlayAudio("010-Hummmmmm.wav");
         DoTriggerEvents("go_to_sleep", sensor);
     }
     else { // wake up
