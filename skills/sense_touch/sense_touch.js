@@ -30,7 +30,7 @@ function _sense_touch(data)
 {
      //let command = data["guardian_command"];    
     let received = data["guardian_data"];
-    misty.Debug("sense_touch: External command received -> " + received);
+    misty.Debug("-->> sense_touch: External command received -> " + received);
     
 
     
@@ -68,7 +68,7 @@ function _Touched(data)
     let sensor = data.AdditionalResults[0];
     let isPressed = data.AdditionalResults[1];
     let time_stamp = data.AdditionalResults[2];
-    isPressed ? misty.Debug(sensor+" is Touched") : misty.Debug(sensor+" is Released");
+    isPressed ? misty.Debug("-->> " + sensor +" is Touched") : misty.Debug(sensor+" is Released");
 
 
     if (isPressed)
@@ -106,18 +106,18 @@ function _Touched(data)
                 }
                 break;
             default:
-                misty.Debug("Sensor Name '" + sensor + "' is unknown.");
+                misty.Debug("-->> Sensor Name '" + sensor + "' is unknown.");
         }
 
         DoTriggerEvents("touch_detected");
     }
     else
     {
-        misty.Set("_waiting_for_timeout", false); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
-        delta_t = DetectLongPress(sensor, time_stamp);
+        DoStopTimer();//misty.Set("_waiting_for_timeout", false); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
+/*         delta_t = DetectLongPress(sensor, time_stamp);
         if (delta_t > 3000)
         {
-            misty.Debug("-> Long press detected");
+            misty.Debug("-->> Long press detected");
             switch (sensor)
             {
                 case "Scruff":
@@ -133,7 +133,7 @@ function _Touched(data)
                     DoToggleSleepMode();
                     break;
             }
-        }
+        } */
         misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":false, "time_stamp":time_stamp}));
 
     }
@@ -157,7 +157,7 @@ function DetectLongPress(sensor, time_stamp)
             let t_current_time = Date.parse(time_stamp) //.valueOf();
             //misty.Debug("--->> " + t_current_time);
             delta_t =  t_current_time - t_last_time;
-            misty.Debug("--->> " + delta_t);
+            misty.Debug("--->> " + delta_t + " ms delayed release detected");
         }
         misty.Set("_last_sensor",""); // reset time tracking of sensor pressed
     }
@@ -178,14 +178,14 @@ function DoTriggerEvents(behavior, sensor)
             var msg = "off";
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
             misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({tosleep: True}) , "");
+            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": True}) , "");
             break;
         case "wake_up":
             misty.TriggerEvent("behavior_wake_up", "sense_touch", "", "");
             var msg = "on";
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
             misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({tosleep: False}) , "");
+            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": False}) , "");
             break;
         case "touch_detected":
             var msg = "touch_detected";
@@ -205,13 +205,13 @@ function DoToggleSleepMode()
     {
         // go_to_sleep
         misty.Set("_touch_active", false);
-        misty.PlayAudio("020-Whoap.wav");
-        DoTriggerEvents("go_to_sleep", sensor);
+        misty.PlayAudio("007-Eurhura.wav");
+        //DoTriggerEvents("go_to_sleep", sensor);
     }
     else { // wake up
         misty.Set("_touch_active", true);
         misty.PlayAudio("001-OooOooo.wav");
-        DoTriggerEvents("wake_up", sensor);
+        //DoTriggerEvents("wake_up", sensor);
     }
 }
 
@@ -224,16 +224,17 @@ function DoStartTimer()
 
 function DoStopTimer()
 {
-    misty.UnregisterEvent("timeOutLongPress");
+    //misty.UnregisterEvent("timeOutLongPress");
     misty.Set("_waiting_for_timeout", false);
 }
 
 function _timeOutLongPress(data)
 {
+    misty.Debug("-->> timer timed out");
     if (misty.Get("_waiting_for_timeout"))
     {
         var last_sensor = misty.Get("_last_sensor");
-    
+        misty.Debug("-->> long press detected, " + last_sensor);
         if (last_sensor != "")
         {
             var last_sensor = JSON.parse(_last_sensor);
