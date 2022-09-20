@@ -8,13 +8,13 @@ Created on Mon Feb 22 12:16:49 2021
 import requests
 import json
 
-robot_ip = '192.168.0.101'
+robot_ip = '192.168.0.103'
 source = "MyRobotApplication"
 #skill_id = "5d3e55e9-c878-4fbc-8d62-172fbdd9c48c"
 #event_name = "eye_contact"
 
-#skill_id = "0723e9a7-8e10-4931-b2a1-9a36b895a04c"
-#event_name = "sense_touch"
+skill_id = "0723e9a7-8e10-4931-b2a1-9a36b895a04c"
+event_name = "sense_touch"
 
 #skill_id = "6ca82a95-01f2-4a85-b6e0-fc3480fef6cb"
 #event_name = "listen_voices"
@@ -23,8 +23,8 @@ source = "MyRobotApplication"
 #skill_id = "f711c84c-78f4-4d49-ac3c-ee3f9c7a7b66"
 #event_name = "display_faces"
 
-skill_id = "fe6336e8-43bf-4afb-aca7-6bccd6f0338a"
-event_name = "emotion_enjoy" #"behavior_go_to_standby" #"behavior_wake_up" #"emotion_sadness"
+#skill_id = "fe6336e8-43bf-4afb-aca7-6bccd6f0338a"
+#event_name = "emotion_enjoy" #"behavior_go_to_standby" #"behavior_wake_up" #"emotion_sadness"
 
 
 def send_command(the_command, the_event_name = event_name, the_source = source):
@@ -32,8 +32,8 @@ def send_command(the_command, the_event_name = event_name, the_source = source):
         "Skill" : skill_id,
         "EventName": the_event_name,
         "Payload": { ##"guardian_command": "eye_contact",
-        #            "guardian_data": the_command}, # for eye_contact, sense_touch etc
-                    "guardian_data": {"image":the_command,"blinking":True,"time_out":5}}, # for display_faces
+                    "guardian_data": the_command}, # for eye_contact, sense_touch etc
+        #            "guardian_data": {"image":the_command,"blinking":True,"time_out":5}}, # for display_faces
         "Source": the_source})
     return resp
 

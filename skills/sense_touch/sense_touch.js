@@ -39,10 +39,12 @@ function _sense_touch(data)
         switch (received)
         {
             case "on":
-                misty.Set("_touch_active", true);
+                DoStopTimer();
+                if (!misty.Get("_touch_active")) DoToggleSleepMode("external command");
                 break;
             case "off":
-                misty.Set("_touch_active", false);
+                DoStopTimer();
+                if (misty.Get("_touch_active")) DoToggleSleepMode("external command");
                 break;
             case "default":
         }
@@ -74,8 +76,6 @@ function _Touched(data)
     if (isPressed)
     {
         misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":true, "time_stamp":time_stamp}));
-        misty.Get("_waiting_for_timeout")? DoStopTimer() : DoStartTimer();
-
         switch (sensor)
         {
             case "Chin":
@@ -102,7 +102,7 @@ function _Touched(data)
             case "Scruff":
                 if (misty.Get("_touch_active"))
                 {
-                    misty.PlayAudio("020-Whoap.wav"); //007-Eurhura.wav
+                    misty.PlayAudio("007-Eurhura.wav");
                 }
                 break;
             default:
@@ -113,8 +113,8 @@ function _Touched(data)
     }
     else
     {
-        DoStopTimer();//misty.Set("_waiting_for_timeout", false); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
-/*         delta_t = DetectLongPress(sensor, time_stamp);
+        misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":false, "time_stamp":time_stamp}));
+/*        delta_t = DetectLongPress(sensor, time_stamp);
         if (delta_t > 3000)
         {
             misty.Debug("-->> Long press detected");
@@ -130,14 +130,14 @@ function _Touched(data)
                 case "HeadFront":
                 case "HeadBack":
                 case "Chin":
-                    DoToggleSleepMode();
+                    DoToggleSleepMode(sensor);
                     break;
             }
-        } */
-        misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":false, "time_stamp":time_stamp}));
+        }*/
+
 
     }
-    
+    misty.Get("_waiting_for_timeout")? DoStopTimer() : DoStartTimer(); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
     RegisterTouch();    
 }
 
@@ -199,7 +199,7 @@ function DoTriggerEvents(behavior, sensor)
             
 }
 
-function DoToggleSleepMode()
+function DoToggleSleepMode(sensor)
 {
     if (misty.Get("_touch_active"))
     {
@@ -230,14 +230,14 @@ function DoStopTimer()
 
 function _timeOutLongPress(data)
 {
-    misty.Debug("-->> timer timed out");
+//    misty.Debug("-->> Time out occurred");
     if (misty.Get("_waiting_for_timeout"))
     {
         var last_sensor = misty.Get("_last_sensor");
-        misty.Debug("-->> long press detected, " + last_sensor);
+//        misty.Debug("-->>> was still waiting, so longpress" + last_sensor);
         if (last_sensor != "")
         {
-            var last_sensor = JSON.parse(_last_sensor);
+            var last_sensor = JSON.parse(last_sensor);
             switch (last_sensor.sensor)
             {
                 case "Scruff":
@@ -246,7 +246,7 @@ function _timeOutLongPress(data)
                 //case "HeadFront":
                 //case "HeadBack":
                 case "Chin":
-                    DoToggleSleepMode();
+                    DoToggleSleepMode(last_sensor.sensor);
                     break;
             }
         }
