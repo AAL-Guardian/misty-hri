@@ -5,7 +5,7 @@ function _emotion_how_are_you(data) {
 
     // INPUT PARAMETERS
     data = JSON.parse(data.guardian_data);
-    misty.MoveHead(0, 40, 0, 100);
+    misty.MoveHead(0, 30, 0, 100);
     misty.Pause(3000);
     misty.MoveHead(0, 0, 0, 100);
 }
@@ -18,7 +18,7 @@ function _emotion_yes(data) {
 
     // INPUT PARAMETER
     data = JSON.parse(data.guardian_data);
-    misty.MoveHead(-40, 0, 0, 100);
+    misty.MoveHead(-35, 0, 0, 100);
     misty.MoveHead(26, 0, 0, 100);
     misty.MoveHead(0, 0, 0, 100);
     misty.DisplayImage("e_EcstacyStarryEyed.jpg");
@@ -47,7 +47,7 @@ function _emotion_yesmedication(data) {
 
     // INPUT PARAMETERS
     data = JSON.parse(data.guardian_data);
-    misty.MoveHead(-40, 0, 0, 100);
+    misty.MoveHead(-38, 0, 0, 100);
     misty.MoveHead(26, 0, 0, 100);
     misty.MoveHead(0, 0, 0, 100);
     misty.DisplayImage("e_Joy.jpg");
@@ -100,7 +100,7 @@ misty.RegisterUserEvent("emotion_dormi", true);
 function _emotion_dormi(data) {
     misty.DisplayImage("e_SleepingZZZ.jpg");
     misty.SetBlinking(false); // turn blinking on/off
-    misty.MoveHead(40, 0, 0, 100);
+    misty.MoveHead(38, 0, 0, 100);
 
 }
 
