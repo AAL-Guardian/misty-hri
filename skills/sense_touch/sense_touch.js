@@ -8,12 +8,12 @@ misty.Set("_waiting_for_timeout", false);
 
 startSkill();
 
-function message(the_message, sensor_name)
+function message(the_message)
 {
     return JSON.stringify({ "skill" : "sense_touch",
-                            "state" : misty.Get("_touch_active"),
-                            "message": the_message,
-                            "sensor": sensor_name});
+                            "touch active" : misty.Get("_touch_active"),
+                            "message": the_message
+                        });
 }
 
 function startSkill()
@@ -40,17 +40,17 @@ function _sense_touch(data)
         {
             case "on":
                 DoStopTimer();
-                if (!misty.Get("_touch_active")) DoToggleSleepMode("external command");
+                misty.Set("_touch_active", true);
                 break;
             case "off":
                 DoStopTimer();
-                if (misty.Get("_touch_active")) DoToggleSleepMode("external command");
+                misty.Set("_touch_active", false);
                 break;
             case "default":
         }
     //}
     
-    misty.TriggerEvent("guardian", "sense_touch", message("command_received",""), "");
+    //misty.TriggerEvent("guardian", "sense_touch", message("command_received"), "");
     
     
 }
@@ -123,14 +123,14 @@ function _Touched(data)
                 case "Scruff":
   //                  misty.Set("_touch_active", false);
   //                  misty.PlayAudio("020-Whoap.wav");
- //                   DoTriggerEvents("go_to_sleep", sensor);
+ //                   DoTriggerEvents("go_to_sleep");
  //                   break;
                 case "HeadRight":
                 case "HeadLeft":
                 case "HeadFront":
                 case "HeadBack":
                 case "Chin":
-                    DoToggleSleepMode(sensor);
+                    DoToggleSleepMode(false);
                     break;
             }
         }*/
@@ -165,7 +165,7 @@ function DetectLongPress(sensor, time_stamp)
     return delta_t;
 }
 
-function DoTriggerEvents(behavior, sensor)
+function DoTriggerEvents(behavior)
 {
     switch (behavior)
     {
@@ -174,18 +174,18 @@ function DoTriggerEvents(behavior, sensor)
             // goto sleep mode
             //misty.TriggerEvent("display_faces", "sense_touch", JSON.stringify({"image":'e_Sleep.jpg', "blinking":false, "time_out":0}), "");
             //misty.TriggerEvent("behavior_go_to_sleep", "sense_touch", "", "");
-            misty.TriggerEvent("emotion_dormi", "sense_touch", "", "");
+            //misty.TriggerEvent("emotion_dormi", "sense_touch", "", "");
             var msg = "off";
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": true}) , "");
+            //misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
+            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"skill": "sense_touch","tosleep": true}) , "");
             break;
         case "wake_up":
-            misty.TriggerEvent("behavior_wake_up", "sense_touch", "", "");
+            //misty.TriggerEvent("behavior_wake_up", "sense_touch", "", "");
             var msg = "on";
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": false}) , "");
+            //misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
+            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"skill": "sense_touch","tosleep": false}) , "");
             break;
         case "touch_detected":
             var msg = "touch_detected";
@@ -194,24 +194,24 @@ function DoTriggerEvents(behavior, sensor)
         default:
                    
     }
-    the_message = message(behavior, sensor);
-    misty.TriggerEvent("guardian", "sense_touch", the_message, "");
+    //the_message = message(behavior);
+    //misty.TriggerEvent("guardian", "sense_touch", the_message, "");
             
 }
 
-function DoToggleSleepMode(sensor)
+function DoToggleSleepMode(go_to_sleep)
 {
-    if (misty.Get("_touch_active"))
+    if (go_to_sleep)
     {
         // go_to_sleep
         misty.Set("_touch_active", false);
-        misty.PlayAudio("010-Hummmmmm.wav");
-        DoTriggerEvents("go_to_sleep", sensor);
+        DoTriggerEvents("go_to_sleep");
+        misty.PlayAudio("010-Hummmmmm.wav");  
     }
     else { // wake up
         misty.Set("_touch_active", true);
-        misty.PlayAudio("001-OooOooo.wav");
-        DoTriggerEvents("wake_up", sensor);
+        DoTriggerEvents("wake_up");
+        misty.PlayAudio("001-OooOooo.wav"); 
     }
 }
 
@@ -241,12 +241,14 @@ function _timeOutLongPress(data)
             switch (last_sensor.sensor)
             {
                 case "Scruff":
-                //case "HeadRight":
-                //case "HeadLeft":
-                //case "HeadFront":
-                //case "HeadBack":
+                case "Headback":
+                    DoToggleSleepMode(true);
+                    break;
+                case "HeadRight":
+                case "HeadLeft":
+                case "HeadFront":
                 case "Chin":
-                    DoToggleSleepMode(last_sensor.sensor);
+                    DoToggleSleepMode(false);
                     break;
             }
         }

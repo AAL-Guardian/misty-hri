@@ -19,8 +19,8 @@ function startSkill()
 
     let default_data = {"off" :{"time_out":0, "look_around":0}, //0 is never
                         "standby" :{"time_out":0, "look_around":0}, //0 is never
-                        "normal":{"time_out":20000  , "look_around":2},
-                        "alert" :{"time_out":10000   , "look_around":3}
+                        "normal":{"time_out":60000  , "look_around":0},
+                        "alert" :{"time_out":30000   , "look_around":0}
                     };
     eye_state = {   "image":"e_DefaultContent.jpg",
                     "blinking": true};
@@ -324,6 +324,7 @@ function _FaceDetect(data) {
             var new_data = state_data;
     }
     //registerFaceDetection(); // restart face
+    misty.TriggerEvent("guardian", "eye_contact",JSON.stringify({"skill":"eye_contact","face_detected": true}) , "");
     stateMachine(new_state, new_data); // updates eyes and registers events based on the state
     
 }
