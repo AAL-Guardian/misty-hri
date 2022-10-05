@@ -4,7 +4,7 @@ name: "auto-release"
 on:
   push:
     branches:
-      - prototype3
+      - final
 
 jobs:
   prepare-artifacts:
@@ -13,13 +13,9 @@ jobs:
         matrix:
           skill: 
             - change_led
-            # - display_faces
             - eye_contact
-            - head_position_reporter
-            # - listen_answers
+            - listen_answers
             - listen_voices
-            # - old_listen_voices
-            # - speak_to_user
             - senior_robot
             - sense_touch
             - speak_from_url
