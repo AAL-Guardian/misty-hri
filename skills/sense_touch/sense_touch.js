@@ -40,11 +40,11 @@ function _sense_touch(data)
         {
             case "on":
                 DoStopTimer();
-                if (!misty.Get("_touch_active")) DoToggleSleepMode("external command");
+                EnableSleepMode(false);
                 break;
             case "off":
                 DoStopTimer();
-                if (misty.Get("_touch_active")) DoToggleSleepMode("external command");
+                EnableSleepMode(true);
                 break;
             case "default":
         }
@@ -141,7 +141,7 @@ function _Touched(data)
     RegisterTouch();    
 }
 
-function DetectLongPress(sensor, time_stamp)
+/*function DetectLongPress(sensor, time_stamp)
 {
     var _last_sensor = misty.Get("_last_sensor");
     var delta_t = 0;
@@ -164,7 +164,7 @@ function DetectLongPress(sensor, time_stamp)
     
     return delta_t;
 }
-
+*/
 function DoTriggerEvents(behavior)
 {
     switch (behavior)
@@ -199,19 +199,20 @@ function DoTriggerEvents(behavior)
             
 }
 
-function DoToggleSleepMode(sensor)
+function EnableSleepMode(is_active)
 {
-    if (misty.Get("_touch_active"))
+    if (is_active)
+    { // wake up
+        misty.Set("_touch_active", true);
+        misty.PlayAudio("001-OooOooo.wav");
+        //DoTriggerEvents("wake_up", sensor);
+    }
+    else
     {
         // go_to_sleep
         misty.Set("_touch_active", false);
         misty.PlayAudio("007-Eurhura.wav");
         //DoTriggerEvents("go_to_sleep", sensor);
-    }
-    else { // wake up
-        misty.Set("_touch_active", true);
-        misty.PlayAudio("001-OooOooo.wav");
-        //DoTriggerEvents("wake_up", sensor);
     }
 }
 
@@ -241,12 +242,15 @@ function _timeOutLongPress(data)
             switch (last_sensor.sensor)
             {
                 case "Scruff":
+                case "HeadBack":
                 //case "HeadRight":
                 //case "HeadLeft":
                 //case "HeadFront":
-                //case "HeadBack":
+                    EnableSleepMode(false);
+                    break;
+
                 case "Chin":
-                    DoToggleSleepMode(last_sensor.sensor);
+                    EnableSleepMode(true);
                     break;
             }
         }
