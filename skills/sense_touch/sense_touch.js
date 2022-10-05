@@ -89,6 +89,7 @@ function _Touched(data)
                     misty.Pause(3000);
                     misty.DisplayImage("e_DefaultContent.jpg"); // Change eyes
                 }
+                DoTriggerEvents("touch_detected");
                 break;
             case "HeadRight":
             case "HeadLeft":
@@ -98,24 +99,27 @@ function _Touched(data)
                 {
                     misty.PlayAudio("010-Uhm.wav");
                 }
+                DoTriggerEvents("touch_detected");
                 break;
             case "Scruff":
                 if (misty.Get("_touch_active"))
                 {
-                    misty.PlayAudio("005-Eurra.wav");//"007-Eurhura.wav");
+                    //misty.PlayAudio("005-Eurra.wav");//"007-Eurhura.wav");
+                    EnableSleepMode(true);
+                }
+                else {
+                    EnableSleepMode(false);
                 }
                 break;
             default:
                 misty.Debug("-->> Sensor Name '" + sensor + "' is unknown.");
         }
-        DoStartTimer();
-
-        DoTriggerEvents("touch_detected");
+        
     }
     else
     {
         misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":false, "time_stamp":time_stamp}));
-        DoStopTimer();
+
 /*        delta_t = DetectLongPress(sensor, time_stamp);
         if (delta_t > 3000)
         {
@@ -206,7 +210,7 @@ function EnableSleepMode(is_enable_sleep)
     if (is_enable_sleep)
     {      // go_to_sleep
         misty.Set("_touch_active", false);
-        misty.PlayAudio("007-Eurhura.wav");
+        misty.PlayAudio("005-Eurra.wav"); //"007-Eurhura.wav");
         DoTriggerEvents("go_to_sleep", sensor);
     }
     else { // wake up
@@ -216,7 +220,7 @@ function EnableSleepMode(is_enable_sleep)
     }
     
 }
-
+/*
 function DoStartTimer()
 {
     let time_out=3000;
@@ -272,3 +276,4 @@ function _timeOutLongPress(data)
         // time out interrupted by newer touch event, do nothing
     }
 }
+*/
