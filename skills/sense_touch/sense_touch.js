@@ -4,6 +4,7 @@ misty.Debug("Sense_touch skill has started.");
 
 misty.Set("_touch_active", true);
 misty.Set("_last_sensor","");
+misty.Set("_timer_has_started", false);
 misty.Set("_waiting_for_timeout", false);
 
 startSkill();
@@ -72,7 +73,6 @@ function _Touched(data)
     let time_stamp = data.AdditionalResults[2];
     isPressed ? misty.Debug("----->> " + sensor +" is Touched") : misty.Debug("----->>" + sensor + " is Released");
 
-
     if (isPressed)
     {
         misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":true, "time_stamp":time_stamp}));
@@ -102,7 +102,7 @@ function _Touched(data)
             case "Scruff":
                 if (misty.Get("_touch_active"))
                 {
-                    misty.PlayAudio("007-Eurhura.wav");
+                    misty.PlayAudio("005-Eurra.wav");//"007-Eurhura.wav");
                 }
                 break;
             default:
@@ -139,7 +139,7 @@ function _Touched(data)
 
 
     }
-    // misty.Get("_waiting_for_timeout")? DoStopTimer() : DoStartTimer(); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
+    //misty.Get("_waiting_for_timeout")? DoStopTimer() : DoStartTimer(); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
     //RegisterTouch();    
 }
 
@@ -220,10 +220,11 @@ function EnableSleepMode(is_enable_sleep)
 function DoStartTimer()
 {
     let time_out=3000;
-    if(misty.Get("_waiting_for_timeout")) {
+    if(misty.Get("_timer_has_started")) {
         return;
     }
     misty.RegisterTimerEvent("timeOutLongPress", time_out, false);
+    misty.Set("_timer_has_started", true);
     misty.Set("_waiting_for_timeout", true);
     misty.Debug("--> Timeout started");
 }
@@ -231,6 +232,7 @@ function DoStartTimer()
 function DoStopTimer()
 {
     misty.UnregisterEvent("timeOutLongPress");
+    misty.Set("_timer_has_started", false);
     misty.Set("_waiting_for_timeout", false);
     misty.Debug("++> Timer ended");
 }
