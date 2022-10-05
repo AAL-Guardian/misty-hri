@@ -15,6 +15,7 @@ function _listen_answers(data) {
 
     // START WORK
     misty.Debug("Start Recording Audio Answer");
+    misty.PlayAudio("005-Eurra.wav", 100);
     misty.StartRecordingAudio(filename, 0, time * 1000)
     // misty.Pause(time * 1000);
     misty.StopRecordingAudio();
