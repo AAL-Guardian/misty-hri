@@ -62,7 +62,7 @@ function RegisterTouch()
     misty.AddReturnProperty("Touched", "SensorPosition");
     misty.AddReturnProperty("Touched", "IsContacted");
     misty.AddReturnProperty("Touched", "created");
-    misty.RegisterEvent("Touched", "TouchSensor", 20 ,false);
+    misty.RegisterEvent("Touched", "TouchSensor", 100 ,true);
 }
 
 function _Touched(data)
@@ -70,7 +70,7 @@ function _Touched(data)
     let sensor = data.AdditionalResults[0];
     let isPressed = data.AdditionalResults[1];
     let time_stamp = data.AdditionalResults[2];
-    isPressed ? misty.Debug("-->> " + sensor +" is Touched") : misty.Debug(sensor+" is Released");
+    isPressed ? misty.Debug("----->> " + sensor +" is Touched") : misty.Debug("----->>" + sensor + " is Released");
 
 
     if (isPressed)
@@ -108,12 +108,14 @@ function _Touched(data)
             default:
                 misty.Debug("-->> Sensor Name '" + sensor + "' is unknown.");
         }
+        DoStartTimer();
 
         DoTriggerEvents("touch_detected");
     }
     else
     {
         misty.Set("_last_sensor", JSON.stringify({"sensor":sensor, "is_pressed":false, "time_stamp":time_stamp}));
+        DoStopTimer();
 /*        delta_t = DetectLongPress(sensor, time_stamp);
         if (delta_t > 3000)
         {
@@ -137,8 +139,8 @@ function _Touched(data)
 
 
     }
-    misty.Get("_waiting_for_timeout")? DoStopTimer() : DoStartTimer(); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
-    RegisterTouch();    
+    // misty.Get("_waiting_for_timeout")? DoStopTimer() : DoStartTimer(); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
+    //RegisterTouch();    
 }
 
 /*function DetectLongPress(sensor, time_stamp)
@@ -199,34 +201,38 @@ function DoTriggerEvents(behavior)
             
 }
 
-function EnableSleepMode(is_active)
+function EnableSleepMode(is_enable_sleep)
 {
-    if (!is_active)
-    { // wake up
-        misty.Set("_touch_active", true);
-        misty.PlayAudio("001-OooOooo.wav");
-        //DoTriggerEvents("wake_up", sensor);
-    }
-    else
-    {
-        // go_to_sleep
+    if (is_enable_sleep)
+    {      // go_to_sleep
         misty.Set("_touch_active", false);
         misty.PlayAudio("007-Eurhura.wav");
-        //DoTriggerEvents("go_to_sleep", sensor);
+        DoTriggerEvents("go_to_sleep", sensor);
     }
+    else { // wake up
+        misty.Set("_touch_active", true);
+        misty.PlayAudio("001-OooOooo.wav");
+        DoTriggerEvents("wake_up", sensor);
+    }
+    
 }
 
 function DoStartTimer()
 {
-    time_out=3000;
+    let time_out=3000;
+    if(misty.Get("_waiting_for_timeout")) {
+        return;
+    }
     misty.RegisterTimerEvent("timeOutLongPress", time_out, false);
     misty.Set("_waiting_for_timeout", true);
+    misty.Debug("--> Timeout started");
 }
 
 function DoStopTimer()
 {
-    //misty.UnregisterEvent("timeOutLongPress");
+    misty.UnregisterEvent("timeOutLongPress");
     misty.Set("_waiting_for_timeout", false);
+    misty.Debug("++> Timer ended");
 }
 
 function _timeOutLongPress(data)
@@ -253,7 +259,12 @@ function _timeOutLongPress(data)
                     EnableSleepMode(false);
                     break;
             }
+            //misty.Set("_waiting_for_timeout", false);
         }
+        else {
+            // do nothing
+        }
+        
     }
     else {
         // time out interrupted by newer touch event, do nothing
