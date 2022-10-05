@@ -201,7 +201,7 @@ function DoTriggerEvents(behavior)
 
 function EnableSleepMode(is_active)
 {
-    if (is_active)
+    if (!is_active)
     { // wake up
         misty.Set("_touch_active", true);
         misty.PlayAudio("001-OooOooo.wav");
@@ -246,11 +246,11 @@ function _timeOutLongPress(data)
                 //case "HeadRight":
                 //case "HeadLeft":
                 //case "HeadFront":
-                    EnableSleepMode(false);
+                    EnableSleepMode(true);
                     break;
 
                 case "Chin":
-                    EnableSleepMode(true);
+                    EnableSleepMode(false);
                     break;
             }
         }
