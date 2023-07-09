@@ -1,6 +1,4 @@
 misty.RegisterUserEvent("emotion_how_are_you", true);
-
-// TimerEvent callback
 function _emotion_how_are_you(data) {
 
     // INPUT PARAMETERS
@@ -12,8 +10,6 @@ function _emotion_how_are_you(data) {
 
 
 misty.RegisterUserEvent("emotion_yes", true);
-
-// TimerEvent callback
 function _emotion_yes(data) {
 
     // INPUT PARAMETER
@@ -41,8 +37,6 @@ function _emotion_medication(data) {
 
 }
 misty.RegisterUserEvent("emotion_yesmedication", true);
-
-// TimerEvent callback
 function _emotion_yesmedication(data) {
 
     // INPUT PARAMETERS
@@ -95,8 +89,6 @@ function _emotion_activitysuggestion(data) {
 }
 
 misty.RegisterUserEvent("emotion_dormi", true);
-
-// TimerEvent callback
 function _emotion_dormi(data) {
     misty.DisplayImage("e_SleepingZZZ.jpg");
     misty.SetBlinking(false); // turn blinking on/off
@@ -106,8 +98,6 @@ function _emotion_dormi(data) {
 
 
 misty.RegisterUserEvent("emotion_sveglia", true);
-
-// TimerEvent callback
 function _emotion_sveglia(data) {
     misty.DisplayImage("e_DefaultContent.jpg");
     misty.SetBlinking(true); // turn blinking on/off
@@ -164,14 +154,14 @@ function _behavior_wake_up(data)
     misty.SetBlinking(true); // turn blinking on/off
 
     misty.MoveHead(0, 0, 0, 80);
-/*     
+     
     misty.MoveArmDegrees("left", 90, 45); // Left arm fully down
     misty.Pause(50);
     misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
     misty.Pause(50); // Pause for 3 seconds
     misty.MoveArmDegrees("right", -45, 45); // Right arm fully up
     misty.Pause(1000); // Pause with arm up for 5 seconds (wave!)
-    misty.MoveArmDegrees("right", 90, 45); // Right arm fully down */
+    misty.MoveArmDegrees("right", 90, 45); // Right arm fully down
 }
 
 misty.RegisterUserEvent("behavior_go_to_alert",true);

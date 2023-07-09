@@ -413,33 +413,33 @@ function changeEyes()
     {
         case "off":
             misty.ChangeLED(0, 0, 0); // Changes LED to off
-            //new_image = "e_Sleeping.jpg";
-            //new_blink = false;
-            //misty.TriggerEvent("behavior_go_to_normal", "eye_contact", "", "");
+            new_image = "e_Sleeping.jpg";
+            new_blink = false;
+            misty.TriggerEvent("behavior_go_to_sleep", "eye_contact", "", "");
             break;           
         case "standby":
             misty.ChangeLED(0, 0, 0); // Changes LED to off
             new_image = "e_Sleepy2.jpg"; // Show sleeping eyes
             new_blink = false;  // turn blinking off
-            //misty.TriggerEvent("behavior_go_to_standby", "eye_contact", "", "");
+            misty.TriggerEvent("behavior_go_to_standby", "eye_contact", "", "");
             break;
         case "normal":
             misty.ChangeLED(255, 255, 255); // Changes LED to white
             new_image = "e_DefaultContent.jpg"; // Show default eyes
             new_blink =true;
-            //misty.TriggerEvent("behavior_go_to_normal", "eye_contact", "", "");
+            misty.TriggerEvent("behavior_go_to_normal", "eye_contact", "", "");
             break;
         case "alert":
             misty.ChangeLED(0, 255, 0); // Changes LED to green
             new_image = "e_Joy.jpg"; // Show default eyes
             new_blink = true;
-            //misty.TriggerEvent("behavior_go_to_alert", "eye_contact", "", "");
+            misty.TriggerEvent("behavior_go_to_alert", "eye_contact", "", "");
             break;
         default:
             misty.ChangeLED(148, 0, 211); // Changes LED to purple
             new_image = "e_Surprise.jpg"; // Show default eyes
             new_blink = true;
-            //misty.TriggerEvent("emotion_surprised", "eye_contact", "", "");
+            misty.TriggerEvent("emotion_surprised", "eye_contact", "", "");
             break;
     }
 

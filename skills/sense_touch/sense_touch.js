@@ -174,18 +174,18 @@ function DoTriggerEvents(behavior)
             // goto sleep mode
             //misty.TriggerEvent("display_faces", "sense_touch", JSON.stringify({"image":'e_Sleep.jpg', "blinking":false, "time_out":0}), "");
             //misty.TriggerEvent("behavior_go_to_sleep", "sense_touch", "", "");
-            //misty.TriggerEvent("emotion_dormi", "sense_touch", "", "");
+            misty.TriggerEvent("emotion_dormi", "sense_touch", "", "");
             var msg = "off";
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": True}) , "");
+            //misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
+            //misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": True}) , "");
             break;
         case "wake_up":
-            //misty.TriggerEvent("behavior_wake_up", "sense_touch", "", "");
+            misty.TriggerEvent("behavior_wake_up", "sense_touch", "", "");
             var msg = "on";
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
-            misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": False}) , "");
+            //misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
+            //misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": False}) , "");
             break;
         case "touch_detected":
             var msg = "touch_detected";
@@ -206,12 +206,12 @@ function DoToggleSleepMode(sensor)
         // go_to_sleep
         misty.Set("_touch_active", false);
         misty.PlayAudio("007-Eurhura.wav");
-        //DoTriggerEvents("go_to_sleep", sensor);
+        DoTriggerEvents("go_to_sleep", sensor);
     }
     else { // wake up
         misty.Set("_touch_active", true);
         misty.PlayAudio("001-OooOooo.wav");
-        //DoTriggerEvents("wake_up", sensor);
+        DoTriggerEvents("wake_up", sensor);
     }
 }
 
