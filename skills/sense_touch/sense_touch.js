@@ -104,12 +104,17 @@ function _Touched(data)
                 {
                     misty.PlayAudio("007-Eurhura.wav");
                 }
+                if (misty.Get("_waiting_for_timeout")==false)
+                {
+                    DoStartTimer()
+                }
                 break;
             default:
                 misty.Debug("-->> Sensor Name '" + sensor + "' is unknown.");
         }
 
         DoTriggerEvents("touch_detected");
+
     }
     else
     {
@@ -135,9 +140,16 @@ function _Touched(data)
             }
         }*/
 
-
+        if (misty.Get("_waiting_for_timeout"))
+        {
+            switch (sensor)
+            {
+                case "Scruff":
+                    DoStopTimer();
+                    break;
+            }
+        }
     }
-    misty.Get("_waiting_for_timeout")? DoStopTimer() : DoStartTimer(); // if timeout hasn't taken place, less than 3s have passed when the sensor is released. So prevent timeout effects.
     RegisterTouch();    
 }
 
@@ -179,6 +191,8 @@ function DoTriggerEvents(behavior)
             misty.TriggerEvent("eye_contact", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
             //misty.TriggerEvent("listen_voices", "sense_touch", JSON.stringify({"guardian_data": msg}) , "");
             //misty.TriggerEvent("guardian", "sense_touch",JSON.stringify({"tosleep": True}) , "");
+            misty.Pause(100)
+            misty.TriggerEvent("emotion_dormi", "sense_touch", "", "");
             break;
         case "wake_up":
             misty.TriggerEvent("behavior_wake_up", "sense_touch", "", "");
@@ -194,6 +208,7 @@ function DoTriggerEvents(behavior)
         default:
                    
     }
+   
     //the_message = message(behavior);
     //misty.TriggerEvent("guardian", "sense_touch", the_message, "");
             
@@ -217,9 +232,9 @@ function DoToggleSleepMode(sensor)
 
 function DoStartTimer()
 {
-    time_out=3000;
-    misty.RegisterTimerEvent("timeOutLongPress", time_out, false);
+    time_out=2000;
     misty.Set("_waiting_for_timeout", true);
+    misty.RegisterTimerEvent("timeOutLongPress", time_out, false);
 }
 
 function DoStopTimer()
@@ -233,8 +248,9 @@ function _timeOutLongPress(data)
 //    misty.Debug("-->> Time out occurred");
     if (misty.Get("_waiting_for_timeout"))
     {
+        DoStopTimer() // time-out so update boolean state variable    
         var last_sensor = misty.Get("_last_sensor");
-//        misty.Debug("-->>> was still waiting, so longpress" + last_sensor);
+        misty.Debug("-->>> was still waiting, so longpress" + last_sensor);
         if (last_sensor != "")
         {
             var last_sensor = JSON.parse(last_sensor);
@@ -245,13 +261,14 @@ function _timeOutLongPress(data)
                 //case "HeadLeft":
                 //case "HeadFront":
                 //case "HeadBack":
-                case "Chin":
+                //case "Chin":
                     DoToggleSleepMode(last_sensor.sensor);
                     break;
             }
         }
     }
     else {
-        // time out interrupted by newer touch event, do nothing
+        // time out ocurred but was not waiting for it, do nothing
     }
+    
 }
